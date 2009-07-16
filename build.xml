@@ -1,0 +1,106 @@
+<project name="JsMockito" default="basic" basedir=".">
+    <property file="build.properties"/>
+
+    <property name="DIST_V" value="${BUILD_DIR}/${NAME_V}.js"/>
+    <property name="DIST_PACK_V" value="${BUILD_DIR}/${NAME_V}-minified.js"/>
+
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties">
+        <classpath>
+            <pathelement location="${LIB_DIR}/ant-contrib.jar"/>
+        </classpath>
+    </taskdef>
+
+    <taskdef name="jsdoctoolkit" classname="uk.co.darrenhurley.ant.tasks.JsDocToolkit">
+        <classpath>
+            <pathelement location="${LIB_DIR}/js.jar"/>
+            <pathelement location="${LIB_DIR}/jsdoctoolkit-ant-task.jar"/>
+        </classpath>
+    </taskdef>
+
+    <exec executable="git" outputproperty="GIT_REVISION">
+        <arg value="rev-list"/>
+        <arg value="--all"/>
+        <arg value="--max-count=1"/>
+        <arg value="--pretty"/>
+    </exec>
+
+    <propertyregex property="REV" input="${GIT_REVISION}" select="\1">
+        <regexp pattern="commit\W+([0-9a-f]+)"/>
+    </propertyregex>
+
+    <propertyregex property="DATE" input="${GIT_REVISION}" select="\1">
+        <regexp pattern="Date:\W+(.*)"/>
+    </propertyregex>
+
+    <target name="clean">
+        <delete dir="${BUILD_DIR}"/>
+        <delete dir="${DIST_DIR}"/>
+    </target>
+
+    <target name="basic" description="Creates the basic script file">
+        <property name="DIST" value="${BUILD_DIR}/${NAME}.js"/>
+        <echo message="Creating ${DIST}" />
+        <mkdir dir="${BUILD_DIR}" />
+        <concat destfile="${DIST}">
+            <fileset dir="${SRC_DIR}" includes="jsmockito.js"/>
+        </concat>
+        <replaceregexp match="@VERSION" replace="${VERSION}" flags="g" byline="true" file="${DIST}"/>
+        <replaceregexp match="@DATE" replace="${DATE}" file="${DIST}"/>
+        <replaceregexp match="@REV" replace="${REV}" file="${DIST}"/>
+        <copy file="${DIST}" tofile="${DIST_V}"/>
+        <echo message="Basic version created at ${DIST}"/>
+    </target>
+    
+    <target name="test" depends="basic" description="Run the test suite using Rhino">
+        <echo message="Running test suite"/>
+        <java jar="${LIB_DIR}/js.jar" dir="spec" fork="true" resultproperty="exitCode">
+            <arg value="runner.js"/>
+        </java>
+        <fail message="Test Suite failed">
+            <condition>
+                <not>
+                    <equals arg1="${exitCode}" arg2="0"/>
+                </not>
+            </condition>
+        </fail>
+    </target>
+    
+    <target name="pack" depends="basic" description="Remove all comments and whitespace and compress">
+        <property name="DIST_PACK" value="${BUILD_DIR}/${NAME}-minified.js"/>
+        <echo message="Packing ${DIST}"/>
+        <java jar="${TOOLS_DIR}/yuicompressor.jar" fork="true">
+            <arg value="-o"/>
+            <arg value="${DIST_PACK}"/>
+            <arg value="${DIST}"/>
+        </java>
+        <copy file="${DIST_PACK}" tofile="${DIST_PACK_V}"/>
+        <echo message="Packed version created at ${DIST_PACK}"/>
+    </target>
+
+    <target name="doc" depends="basic" description="Generate API documentation">
+        <echo message="Creating API docs"/>
+        <jsdoctoolkit jsdochome="${TOOLS_DIR}/jsdoc-toolkit/" template="outline" outputdir="${API_DIR}">
+            <source file="${SRC_DIR}/jsmockito.js"/>
+        </jsdoctoolkit>
+        <echo message="API docs created at ${API_DIR}"/>
+    </target>
+
+    <target name="build" depends="test,doc" description="Performs the build">
+        <echo message="Build complete."/>
+    </target>
+
+    <target name="dist" depends="pack,doc" description="Generates files for distribution">
+        <property name="API_DOC_V" value="${DIST_DIR}/${NAME_V}-api-doc"/>
+        <mkdir dir="${DIST_DIR}"/>
+        <copy file="${DIST_V}" todir="${DIST_DIR}"/>
+        <copy file="${DIST_PACK_V}" todir="${DIST_DIR}"/>
+        <copy todir="${API_DOC_V}">
+            <fileset dir="${API_DIR}"/>
+        </copy>
+        <zip destfile="${API_DOC_V}.zip">
+            <zipfileset dir="${API_DIR}" prefix="${NAME_V}-api-doc"/>
+        </zip>
+        <delete dir="${API_DOC_V}"/>
+        <echo message="Created files for distribution at ${DIST_DIR}"/>
+    </target>
+</project>

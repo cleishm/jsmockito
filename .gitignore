@@ -1,0 +1,6 @@
+/build
+/dist
+/doc
+
+.DS_Store
+.*.swp
