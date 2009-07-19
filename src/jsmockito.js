@@ -38,26 +38,12 @@ JsMockito = {
         Array.prototype.slice.call(arguments, 1));
     };
     mockFunc._jsMockitoVerifier.apply = function(matcher, args) {
-      args = [matcher].concat(args || []);
-      var matchers = [];
-      for (var i = 0; i < args.length; i++) {
-        var matcher = args[i];
-        if (!JsHamcrest.isMatcher(matcher))
-          matcher = JsHamcrest.Matchers.equalTo(matcher);
-        matchers.push(matcher);
-      }
-
+      var matchers = JsMockito.mapMatchers([matcher].concat(args || []));
       for (var i = 0; i < interactions.length; i++) {
-        for (var j = 0; j < matchers.length; j++) {
-          if (!matchers[j].matches(interactions[i][j]))
-            break;
+        if (JsMockito.matchArray(matchers, interactions[i])) {
+          interactions.splice(i,1);
+          return;
         }
-        if (j == matchers.length)
-          break;
-      }
-      if (i != interactions.length) {
-        interactions.splice(i,1);
-        return;
       }
       var description = new JsHamcrest.Description();
       description.append('Wanted but not invoked: func(');
@@ -77,5 +63,24 @@ JsMockito = {
 
   verify: function(mock) {
     return mock._jsMockitoVerifier;
+  },
+
+  matchArray: function(matchers, array) {
+    for (var i = 0; i < matchers.length; i++) {
+      if (!matchers[i].matches(array[i]))
+        return false;
+    }
+    return true;
+  },
+
+  mapMatchers: function(array) {
+    var matchers = [];
+    for (var i = 0; i < array.length; i++) {
+      var matcher = array[i];
+      if (!JsHamcrest.isMatcher(matcher))
+        matcher = JsHamcrest.Matchers.equalTo(matcher);
+      matchers.push(matcher);
+    }
+    return matchers;
   }
 };
