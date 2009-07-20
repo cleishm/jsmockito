@@ -1,6 +1,6 @@
 // vi:ts=2 sw=2 expandtab
 Screw.Unit(function() {
-  describe('JsMockito', function() {
+  describe('JsMockito function mocking', function() {
     describe("when mock function invoked once with no arguments", function() { 
       var mockFunc;
       var scope;

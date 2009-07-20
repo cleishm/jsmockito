@@ -43,6 +43,7 @@
         <mkdir dir="${BUILD_DIR}" />
         <concat destfile="${DIST}">
             <fileset dir="${SRC_DIR}" includes="jsmockito.js"/>
+            <fileset dir="${SRC_DIR}" includes="function.js"/>
         </concat>
         <replaceregexp match="@VERSION" replace="${VERSION}" flags="g" byline="true" file="${DIST}"/>
         <replaceregexp match="@DATE" replace="${DATE}" file="${DIST}"/>
@@ -80,7 +81,7 @@
     <target name="doc" depends="basic" description="Generate API documentation">
         <echo message="Creating API docs"/>
         <jsdoctoolkit jsdochome="${TOOLS_DIR}/jsdoc-toolkit/" template="outline" outputdir="${API_DIR}">
-            <source file="${SRC_DIR}/jsmockito.js"/>
+            <source file="${DIST}"/>
         </jsdoctoolkit>
         <echo message="API docs created at ${API_DIR}"/>
     </target>
