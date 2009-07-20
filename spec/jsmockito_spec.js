@@ -174,5 +174,201 @@ Screw.Unit(function() {
           "Wanted but not invoked: func(<equal to 1>, <equal to \"boo\">, <equal to " + args[2] + ">), 'this' being anything"));
       });
     });
+
+    describe("when mock function is stubbed with no arguments", function() {
+      describe("when using 'then' and a function stub", function() {
+        var mockFunc;
+        var stubInvoked = false;
+        before(function() {
+          mockFunc = mockFunction();
+          when(mockFunc)().then(function() { stubInvoked = true; return 'stub result' });
+        });
+
+        it("should return result of stub function", function() {
+          assertThat(mockFunc(), equalTo('stub result'));
+        });
+
+        it("should invoke stub function when called", function() {
+          mockFunc();
+          assertThat(stubInvoked, truth());
+        });
+      });
+
+      describe("when using 'thenReturn'", function() {
+        var mockFunc;
+        before(function() {
+          mockFunc = mockFunction();
+          when(mockFunc)().thenReturn(42);
+        });
+
+        it("should return result of stub function", function() {
+          assertThat(mockFunc(), equalTo(42));
+        });
+      });
+
+      describe("when using 'thenThrow'", function() {
+        var mockFunc;
+        var exception = {msg: 'test exception'};
+        before(function() {
+          mockFunc = mockFunction();
+          when(mockFunc)().thenThrow(exception);
+        });
+
+        it("should return result of stub function", function() {
+          var exception;
+          try {
+            mockFunc();
+          } catch (err) {
+            exception = err;
+          }
+          assertThat(exception, not(nil()), "Exception not thrown");
+          assertThat(exception, equalTo(exception));
+        });
+      });
+    });
+
+    describe("when mock function is stubbed with multiple arguments", function() {
+      var mockFunc;
+      var stubInvoked = false;
+      before(function() {
+        mockFunc = mockFunction();
+        when(mockFunc)('foo', lessThan(10), anything()).then(function() { stubInvoked = true; return 'stub result' });
+      });
+
+      it("should return result of stub function", function() {
+        assertThat(mockFunc('foo', 9, {}), equalTo('stub result'));
+      });
+
+      it("should invoke stub function when called", function() {
+        mockFunc.call({}, 'foo', 5, 'bar');
+        assertThat(stubInvoked, truth());
+      });
+
+      it("should invoke stub even if additional arguments are present", function() {
+        assertThat(mockFunc.apply({}, ['foo', 9, {}, 'something else']), equalTo('stub result'));
+      });
+
+      it("should return undefined if insufficent arguments compared to stub", function() {
+        assertThat(mockFunc('foo', 9), equalTo(undefined));
+      });
+
+      it("should return undefined if arguments do not match", function() {
+        assertThat(mockFunc('foo', 11, 'bar'), equalTo(undefined));
+      });
+
+      describe("when stubbing with scope matcher via call", function() {
+        var mockFunc;
+        var stubInvoked = false;
+        var scope = {};
+        before(function() {
+          mockFunc = mockFunction();
+          when(mockFunc).call(scope, 1).then(function() { stubInvoked = true; return 'stub result' });
+        });
+
+        it("should return result of stub function", function() {
+          assertThat(mockFunc.call(scope, 1, 2), equalTo('stub result'));
+        });
+
+        it("should invoke stub function when called", function() {
+          mockFunc.apply(scope, [1, 'fred']);
+          assertThat(stubInvoked, truth());
+        });
+      });
+
+      describe("when stubbing with scope matcher via apply", function() {
+        var mockFunc;
+        var stubInvoked = false;
+        var scope = {};
+        before(function() {
+          mockFunc = mockFunction();
+          when(mockFunc).apply(scope, [1]).then(function() { stubInvoked = true; return 'stub result' });
+        });
+
+        it("should return result of stub function", function() {
+          assertThat(mockFunc.call(scope, 1, 2), equalTo('stub result'));
+        });
+
+        it("should invoke stub function when called", function() {
+          mockFunc.apply(scope, [1, 'fred']);
+          assertThat(stubInvoked, truth());
+        });
+      });
+    });
+
+    describe("when mock function is stubbed multiple times using chained stubber", function() {
+      var mockFunc;
+      before(function() {
+        mockFunc = mockFunction();
+        when(mockFunc)('foo').then(function() { return 'func result' }).thenReturn('value result');
+      });
+
+      it("should return results of first stub first", function() {
+        assertThat(mockFunc('foo'), equalTo('func result'));
+      });
+
+      it("should return results of second stub second", function() {
+        mockFunc('foo');
+        assertThat(mockFunc('foo'), equalTo('value result'));
+      });
+
+      it("should return results of last stub for subsequent invocations", function() {
+        mockFunc('foo');
+        mockFunc('foo');
+        assertThat(mockFunc('foo'), equalTo('value result'));
+        assertThat(mockFunc('foo'), equalTo('value result'));
+      });
+    });
+
+    describe("when mock function is stubbed using multiple arguments to 'then' stubber", function() {
+      var mockFunc;
+      before(function() {
+        mockFunc = mockFunction();
+        when(mockFunc)('foo').then(
+          function() { return 'func result 1' },
+          function() { return 'func result 2' },
+          function() { return 'func result 3' }
+        );
+      });
+
+      it("should return results of first stub first", function() {
+        assertThat(mockFunc('foo'), equalTo('func result 1'));
+      });
+
+      it("should return results of second stub second", function() {
+        mockFunc('foo');
+        assertThat(mockFunc('foo'), equalTo('func result 2'));
+      });
+
+      it("should return results of last stub for subsequent invocations", function() {
+        mockFunc('foo');
+        mockFunc('foo');
+        assertThat(mockFunc('foo'), equalTo('func result 3'));
+        assertThat(mockFunc('foo'), equalTo('func result 3'));
+      });
+    });
+
+    describe("when mock function is stubbed using multiple arguments to 'thenReturn' stubber", function() {
+      var mockFunc;
+      before(function() {
+        mockFunc = mockFunction();
+        when(mockFunc)('foo').thenReturn('func result 1', 'func result 2', 'func result 3');
+      });
+
+      it("should return results of first stub first", function() {
+        assertThat(mockFunc('foo'), equalTo('func result 1'));
+      });
+
+      it("should return results of second stub second", function() {
+        mockFunc('foo');
+        assertThat(mockFunc('foo'), equalTo('func result 2'));
+      });
+
+      it("should return results of last stub for subsequent invocations", function() {
+        mockFunc('foo');
+        mockFunc('foo');
+        assertThat(mockFunc('foo'), equalTo('func result 3'));
+        assertThat(mockFunc('foo'), equalTo('func result 3'));
+      });
+    });
   });
 });

@@ -24,12 +24,46 @@ JsMockito = {
   version: '@VERSION',
 
   mockFunction: function() {
+    var stubMatchers = []
     var interactions = [];
 
     var mockFunc = function() {
-      var args = Array.prototype.slice.call(arguments, 0);
-      interactions.push([this].concat(args));
+      var args = [this];
+      args.push.apply(args, arguments);
+      interactions.push(args);
+
+      for (var i = 0; i < stubMatchers.length; i++) {
+        if (JsMockito.matchArray(stubMatchers[i][0], args)) {
+          var stubs = stubMatchers[i][1];
+          var stub = stubs[0];
+          if (stubs.length > 1)
+            stubs.shift();
+          return stub.apply(this, arguments);
+        }
+      }
+      return undefined;
     };
+
+    mockFunc._jsMockitoStubBuilder = matcherCaptureFunction(function(matchers) {
+      var stubMatch = [matchers, []];
+      stubMatchers.push(stubMatch);
+      return {
+        then: function() {
+          stubMatch[1].push.apply(stubMatch[1], arguments);
+          return this;
+        },
+        thenReturn: function() {
+          var funcs = [];
+          var args = arguments;
+          for (var i = 0; i < args.length; i++) (function() {
+            var value = args[i];
+            funcs.push(function() { return value });
+          })();
+          this.then.apply(this, funcs);
+        },
+        thenThrow: function(exception) { this.then(function() { throw exception }) }
+      };
+    });
 
     mockFunc._jsMockitoVerifier = matcherCaptureFunction(function(matchers) {
       for (var i = 0; i < interactions.length; i++) {
@@ -58,16 +92,16 @@ JsMockito = {
       // generate a function with overridden 'call' and 'apply' methods
       // to capture 'this' as a matcher for these cases
       var captureFunction = function() {
-        captureFunction.apply(JsHamcrest.Matchers.anything(), 
+        return captureFunction.apply(JsHamcrest.Matchers.anything(), 
           Array.prototype.slice.call(arguments, 0));
       };
       captureFunction.call = function(scope) {
-        captureFunction.apply(scope,
+        return captureFunction.apply(scope,
           Array.prototype.slice.call(arguments, 1));
       };
       captureFunction.apply = function(scope, args) {
         var matchers = JsMockito.mapToMatchers([scope].concat(args || []));
-        handler(matchers);
+        return handler(matchers);
       };
       return captureFunction;
     };
@@ -82,6 +116,8 @@ JsMockito = {
   },
 
   matchArray: function(matchers, array) {
+    if (matchers.length > array.length)
+      return false;
     for (var i = 0; i < matchers.length; i++) {
       if (!matchers[i].matches(array[i]))
         return false;
