@@ -25,20 +25,13 @@ JsMockito = {
 
   mockFunction: function() {
     var interactions = [];
+
     var mockFunc = function() {
       var args = Array.prototype.slice.call(arguments, 0);
       interactions.push([this].concat(args));
     };
-    mockFunc._jsMockitoVerifier = function() {
-      mockFunc._jsMockitoVerifier.apply(JsHamcrest.Matchers.anything(), 
-        Array.prototype.slice.call(arguments, 0));
-    };
-    mockFunc._jsMockitoVerifier.call = function(matcher) {
-      mockFunc._jsMockitoVerifier.apply(matcher,
-        Array.prototype.slice.call(arguments, 1));
-    };
-    mockFunc._jsMockitoVerifier.apply = function(matcher, args) {
-      var matchers = JsMockito.mapMatchers([matcher].concat(args || []));
+
+    mockFunc._jsMockitoVerifier = matcherCaptureFunction(function(matchers) {
       for (var i = 0; i < interactions.length; i++) {
         if (JsMockito.matchArray(matchers, interactions[i])) {
           interactions.splice(i,1);
@@ -57,8 +50,31 @@ JsMockito = {
       description.append("), 'this' being ");
       matchers[0].describeTo(description);
       throw description.get();
-    };
+    });
+
     return mockFunc;
+
+    function matcherCaptureFunction(handler) {
+      // generate a function with overridden 'call' and 'apply' methods
+      // to capture 'this' as a matcher for these cases
+      var captureFunction = function() {
+        captureFunction.apply(JsHamcrest.Matchers.anything(), 
+          Array.prototype.slice.call(arguments, 0));
+      };
+      captureFunction.call = function(scope) {
+        captureFunction.apply(scope,
+          Array.prototype.slice.call(arguments, 1));
+      };
+      captureFunction.apply = function(scope, args) {
+        var matchers = JsMockito.mapToMatchers([scope].concat(args || []));
+        handler(matchers);
+      };
+      return captureFunction;
+    };
+  },
+
+  when: function(mock) {
+    return mock._jsMockitoStubBuilder;
   },
 
   verify: function(mock) {
@@ -73,7 +89,7 @@ JsMockito = {
     return true;
   },
 
-  mapMatchers: function(array) {
+  mapToMatchers: function(array) {
     var matchers = [];
     for (var i = 0; i < array.length; i++) {
       var matcher = array[i];
