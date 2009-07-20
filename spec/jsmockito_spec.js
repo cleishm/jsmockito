@@ -4,10 +4,15 @@ Screw.Unit(function() {
     describe("when mock function invoked once with no arguments", function() { 
       var mockFunc;
       var scope;
+      var result;
       before(function() {
         mockFunc = mockFunction();
         scope = this;
-        mockFunc();
+        var result = mockFunc();
+      });
+
+      it("should return undefined", function() {
+        assertThat(result, equalTo(undefined));
       });
 
       it("should verify mock function was invoked", function() {
@@ -65,11 +70,16 @@ Screw.Unit(function() {
     describe("when mock function invoked twice with no arguments", function() { 
       var mockFunc;
       var scope;
+      var results = [];
       before(function() {
         mockFunc = mockFunction();
         scope = this;
-        mockFunc();
-        mockFunc();
+        results.push(mockFunc());
+        results.push(mockFunc());
+      });
+
+      it("should return undefined each time", function() {
+        assertThat(results, equalTo([undefined, undefined]));
       });
 
       it("should verify twice that mock function was invoked", function() {
@@ -82,9 +92,15 @@ Screw.Unit(function() {
       var mockFunc;
       var scope;
       var args = ['foo'];
+      var result;
       before(function() {
         mockFunc = mockFunction();
-        mockFunc.apply(this, args);
+        scope = this;
+        result = mockFunc.apply(scope, args);
+      });
+
+      it("should return undefined", function() {
+        assertThat(result, equalTo(undefined));
       });
 
       it("should verify mock function was invoked", function() {
@@ -98,13 +114,13 @@ Screw.Unit(function() {
       it("should not verify function was invoked with different arg", function() {
         var exception;
         try { 
-          verify(mockFunc)('bar');
+          verify(mockFunc).call(scope, 'bar');
         } catch (err) {
           exception = err;
         }
         assertThat(exception, not(nil()), "Exception not raised");
         assertThat(exception, equalTo(
-          "Wanted but not invoked: func(<equal to \"bar\">), 'this' being anything"));
+          "Wanted but not invoked: func(<equal to \"bar\">), 'this' being equal to " + scope));
       });
     });
 
@@ -114,22 +130,39 @@ Screw.Unit(function() {
       var args = [1, 'test', {}];
       before(function() {
         mockFunc = mockFunction();
-        mockFunc.apply(this, args);
+        scope = this;
+        mockFunc.apply(scope, args);
       });
 
       it("should verify mock function was invoked", function() {
         verify(mockFunc)();
       });
 
-      it("should verify mock function was invoked with all args", function() {
-        verify(mockFunc).apply(anything(), args);
+      it("should verify mock function was invoked with all args the same", function() {
+        verify(mockFunc).apply(scope, args);
       });
 
-      it("should verify mock function was invoked with some args", function() {
-        verify(mockFunc)(args[0]);
+      it("should verify mock function was invoked with all args matching matchers", function() {
+        verify(mockFunc)(anything(), anything(), anything());
       });
 
-      it("should not verify function was invoked with different args", function() {
+      it("should verify mock function was invoked using less matchers than args", function() {
+        verify(mockFunc).call(anything(), args[0]);
+      });
+
+      it("should not verify function was invoked using more matchers than args", function() {
+        var exception;
+        try { 
+          verify(mockFunc)(args[0], 'boo', {}, anything());
+        } catch (err) {
+          exception = err;
+        }
+        assertThat(exception, not(nil()), "Exception not raised");
+        assertThat(exception, equalTo(
+          "Wanted but not invoked: func(<equal to 1>, <equal to \"boo\">, <equal to " + args[2] + ">, <anything>), 'this' being anything"));
+      });
+
+      it("should not verify function was invoked with args not matching matchers", function() {
         var exception;
         try { 
           verify(mockFunc)(args[0], 'boo', {});
