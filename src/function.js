@@ -24,16 +24,16 @@ JsMockito.mockFunction = function() {
     args.push.apply(args, arguments);
     interactions.push(args);
 
-    for (var i = 0; i < stubMatchers.length; i++) {
-      if (JsMockito.matchArray(stubMatchers[i][0], args)) {
-        var stubs = stubMatchers[i][1];
-        var stub = stubs[0];
-        if (stubs.length > 1)
-          stubs.shift();
-        return stub.apply(this, arguments);
-      }
-    }
-    return undefined;
+    var stubMatcher = JsMockito.find(stubMatchers, function(stubMatcher) {
+      return JsMockito.matchArray(stubMatcher[0], args);
+    });
+    if (stubMatcher == undefined)
+      return undefined;
+    var stubs = stubMatcher[1];
+    var stub = stubs[0];
+    if (stubs.length > 1)
+      stubs.shift();
+    return stub.apply(this, arguments);
   };
 
   mockFunc._jsMockitoStubBuilder = matcherCaptureFunction(function(matchers) {
@@ -45,13 +45,9 @@ JsMockito.mockFunction = function() {
         return this;
       },
       thenReturn: function() {
-        var funcs = [];
-        var args = arguments;
-        for (var i = 0; i < args.length; i++) (function() {
-          var value = args[i];
-          funcs.push(function() { return value });
-        })();
-        this.then.apply(this, funcs);
+        this.then.apply(this, JsMockito.map(arguments, function(value) {
+          return function() { return value };
+        }));
       },
       thenThrow: function(exception) {
         this.then(function() { throw exception })
@@ -66,15 +62,16 @@ JsMockito.mockFunction = function() {
         return;
       }
     }
+
     var description = new JsHamcrest.Description();
     description.append('Wanted but not invoked: func(');
-    for (var i = 1; i < matchers.length; i++) {
-      if (i > 1)
+    JsMockito.each(matchers.splice(1), function(matcher, i) {
+      if (i > 0)
         description.append(', ');
       description.append('<');
-      matchers[i].describeTo(description);
+      matcher.describeTo(description);
       description.append('>');
-    }
+    });
     description.append("), 'this' being ");
     matchers[0].describeTo(description);
     throw description.get();

@@ -30,21 +30,38 @@ JsMockito = {
   matchArray: function(matchers, array) {
     if (matchers.length > array.length)
       return false;
-    for (var i = 0; i < matchers.length; i++) {
-      if (!matchers[i].matches(array[i]))
-        return false;
-    }
-    return true;
+    return !JsMockito.any(matchers, function(matcher, i) {
+      return !matcher.matches(array[i]);
+    });
   },
 
   mapToMatchers: function(array) {
-    var matchers = [];
-    for (var i = 0; i < array.length; i++) {
-      var matcher = array[i];
-      if (!JsHamcrest.isMatcher(matcher))
-        matcher = JsHamcrest.Matchers.equalTo(matcher);
-      matchers.push(matcher);
-    }
-    return matchers;
+    return JsMockito.map(array, function(matcher) {
+      return JsHamcrest.isMatcher(matcher)? matcher :
+        JsHamcrest.Matchers.equalTo(matcher);
+    });
+  },
+
+  each: function(array, callback) {
+    for (var i = 0; i < array.length; i++)
+      callback(array[i], i);
+  },
+
+  map: function(array, callback) {
+    var result = [];
+    for (var i = 0; i < array.length; i++)
+      result.push(callback(array[i], i));
+    return result;
+  },
+
+  find: function(array, callback) {
+    for (var i = 0; i < array.length; i++)
+      if (callback(array[i], i))
+        return array[i];
+    return undefined;
+  },
+
+  any: function(array, callback) {
+    return (this.find(array, callback) != undefined);
   }
 };
