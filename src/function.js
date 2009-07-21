@@ -50,7 +50,9 @@ JsMockito.mockFunction = function() {
         }));
       },
       thenThrow: function(exception) {
-        this.then(function() { throw exception })
+        this.then.apply(this, JsMockito.map(arguments, function(value) {
+          return function() { throw value };
+        }));
       }
     };
   });

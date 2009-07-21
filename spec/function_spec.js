@@ -370,5 +370,36 @@ Screw.Unit(function() {
         assertThat(mockFunc('foo'), equalTo('func result 3'));
       });
     });
+
+    describe("when mock function is stubbed using multiple arguments to 'thenThrow' stubber", function() {
+      var mockFunc;
+      before(function() {
+        mockFunc = mockFunction();
+        when(mockFunc)('foo').thenThrow('ex 1', 'ex 2', 'ex 3');
+      });
+
+      it("should throw first exception first", function() {
+        var exception;
+        try { mockFunc('foo') } catch (ex) { exception = ex };
+        assertThat(exception, equalTo('ex 1'));
+      });
+
+      it("should return results of second stub second", function() {
+        try { mockFunc('foo') } catch (ex) { };
+        var exception;
+        try { mockFunc('foo') } catch (ex) { exception = ex };
+        assertThat(exception, equalTo('ex 2'));
+      });
+
+      it("should return results of last stub for subsequent invocations", function() {
+        try { mockFunc('foo') } catch (ex) { };
+        try { mockFunc('foo') } catch (ex) { };
+        var exception;
+        try { mockFunc('foo') } catch (ex) { exception = ex };
+        assertThat(exception, equalTo('ex 3'));
+        try { mockFunc('foo') } catch (ex) { exception = ex };
+        assertThat(exception, equalTo('ex 3'));
+      });
+    });
   });
 });
