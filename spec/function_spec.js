@@ -8,7 +8,7 @@ Screw.Unit(function() {
       before(function() {
         mockFunc = mockFunction();
         scope = this;
-        var result = mockFunc();
+        result = mockFunc();
       });
 
       it("should return undefined", function() {
@@ -176,12 +176,30 @@ Screw.Unit(function() {
     });
 
     describe("when mock function is stubbed with no arguments", function() {
-      describe("when using 'then' and a function stub", function() {
-        var mockFunc;
-        var stubInvoked = false;
+      var mockFunc;
+      before(function() {
+        mockFunc = mockFunction();
+      });
+
+      describe("when no then clause applied", function() {
         before(function() {
-          mockFunc = mockFunction();
-          when(mockFunc)().then(function() { stubInvoked = true; return 'stub result' });
+          when(mockFunc)();
+        });
+
+        it("should return undefined", function() {
+          assertThat(mockFunc(), equalTo(undefined));
+        });
+      });
+
+      describe("when using 'then' and a function stub", function() {
+        var stubScope;
+        var stubArguments;
+        before(function() {
+          when(mockFunc)().then(function() {
+            stubScope = this;
+            stubArguments = arguments;
+            return 'stub result';
+          });
         });
 
         it("should return result of stub function", function() {
@@ -190,14 +208,23 @@ Screw.Unit(function() {
 
         it("should invoke stub function when called", function() {
           mockFunc();
-          assertThat(stubInvoked, truth());
+          assertThat(stubArguments, not(nil()));
+        });
+
+        it("should invoke stub function with the same scope", function() {
+          var scope = this;
+          mockFunc();
+          assertThat(stubScope, equalTo(scope), "Scope was not the same");
+        });
+
+        it("should invoke stub function with the same arguments", function() {
+          mockFunc('hello', undefined, 5);
+          assertThat(stubArguments, equalTo(['hello', undefined, 5]));
         });
       });
 
       describe("when using 'thenReturn'", function() {
-        var mockFunc;
         before(function() {
-          mockFunc = mockFunction();
           when(mockFunc)().thenReturn(42);
         });
 
@@ -207,10 +234,8 @@ Screw.Unit(function() {
       });
 
       describe("when using 'thenThrow'", function() {
-        var mockFunc;
         var exception = {msg: 'test exception'};
         before(function() {
-          mockFunc = mockFunction();
           when(mockFunc)().thenThrow(exception);
         });
 
@@ -232,36 +257,38 @@ Screw.Unit(function() {
       var stubInvoked = false;
       before(function() {
         mockFunc = mockFunction();
-        when(mockFunc)('foo', lessThan(10), anything()).then(function() { stubInvoked = true; return 'stub result' });
       });
 
-      it("should return result of stub function", function() {
-        assertThat(mockFunc('foo', 9, {}), equalTo('stub result'));
-      });
+      describe("when stubbing without scope matcher", function() {
+        before(function() {
+          when(mockFunc)('foo', lessThan(10), anything()).then(function() { stubInvoked = true; return 'stub result' });
+        });
 
-      it("should invoke stub function when called", function() {
-        mockFunc.call({}, 'foo', 5, 'bar');
-        assertThat(stubInvoked, truth());
-      });
+        it("should return result of stub function", function() {
+          assertThat(mockFunc('foo', 9, {}), equalTo('stub result'));
+        });
 
-      it("should invoke stub even if additional arguments are present", function() {
-        assertThat(mockFunc.apply({}, ['foo', 9, {}, 'something else']), equalTo('stub result'));
-      });
+        it("should invoke stub function when called", function() {
+          mockFunc.call({}, 'foo', 5, 'bar');
+          assertThat(stubInvoked, truth());
+        });
 
-      it("should return undefined if insufficent arguments compared to stub", function() {
-        assertThat(mockFunc('foo', 9), equalTo(undefined));
-      });
+        it("should invoke stub even if additional arguments are present", function() {
+          assertThat(mockFunc.apply({}, ['foo', 9, {}, 'something else']), equalTo('stub result'));
+        });
 
-      it("should return undefined if arguments do not match", function() {
-        assertThat(mockFunc('foo', 11, 'bar'), equalTo(undefined));
+        it("should return undefined if insufficent arguments compared to stub", function() {
+          assertThat(mockFunc('foo', 9), equalTo(undefined));
+        });
+
+        it("should return undefined if arguments do not match", function() {
+          assertThat(mockFunc('foo', 11, 'bar'), equalTo(undefined));
+        });
       });
 
       describe("when stubbing with scope matcher via call", function() {
-        var mockFunc;
-        var stubInvoked = false;
         var scope = {};
         before(function() {
-          mockFunc = mockFunction();
           when(mockFunc).call(scope, 1).then(function() { stubInvoked = true; return 'stub result' });
         });
 
@@ -276,8 +303,6 @@ Screw.Unit(function() {
       });
 
       describe("when stubbing with scope matcher via apply", function() {
-        var mockFunc;
-        var stubInvoked = false;
         var scope = {};
         before(function() {
           mockFunc = mockFunction();

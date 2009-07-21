@@ -30,6 +30,8 @@ JsMockito.mockFunction = function() {
     if (stubMatcher == undefined)
       return undefined;
     var stubs = stubMatcher[1];
+    if (stubs.length == 0)
+      return undefined;
     var stub = stubs[0];
     if (stubs.length > 1)
       stubs.shift();
