@@ -12,7 +12,7 @@ Screw.Unit(function() {
       });
 
       it("should return undefined", function() {
-        assertThat(result, equalTo(undefined));
+        assertThat(result, sameAs(undefined));
       });
 
       it("should verify mock function was invoked", function() {
@@ -24,7 +24,7 @@ Screw.Unit(function() {
       });
 
       it("should verify mock function was invoked with scope matcher", function() {
-        verify(mockFunc).call(equalTo(scope));
+        verify(mockFunc).call(sameAs(scope));
       });
 
       it("should not verify function was invoked with different scope using call", function() {
@@ -62,8 +62,7 @@ Screw.Unit(function() {
           exception = err;
         }
         assertThat(exception, not(nil()), "Exception not raised");
-        assertThat(exception, equalTo(
-          "Wanted but not invoked: func()"));
+        assertThat(exception, equalTo("Wanted but not invoked: func()"));
       });
     });
 
@@ -100,7 +99,7 @@ Screw.Unit(function() {
       });
 
       it("should return undefined", function() {
-        assertThat(result, equalTo(undefined));
+        assertThat(result, sameAs(undefined));
       });
 
       it("should verify mock function was invoked", function() {
@@ -210,7 +209,7 @@ Screw.Unit(function() {
         });
 
         it("should not apply to invocations with scope different from default", function() {
-          assertThat(mockFunc.call({}, 1, 2), equalTo(undefined));
+          assertThat(mockFunc.call({}, 1, 2), sameAs(undefined));
         });
       });
 
@@ -274,7 +273,7 @@ Screw.Unit(function() {
         });
 
         it("should return undefined", function() {
-          assertThat(mockFunc(), equalTo(undefined));
+          assertThat(mockFunc(), sameAs(undefined));
         });
       });
 
@@ -298,10 +297,16 @@ Screw.Unit(function() {
           assertThat(stubArguments, not(nil()));
         });
 
-        it("should invoke stub function with the same scope", function() {
+        it("should invoke stub function with the same default scope", function() {
           var scope = this;
           mockFunc();
-          assertThat(stubScope, equalTo(scope), "Scope was not the same");
+          assertThat(stubScope, sameAs(scope), "Scope was not the same");
+        });
+
+        it("should invoke stub function with the same explicit scope", function() {
+          var scope = {};
+          mockFunc.call(scope, 1, 'foo');
+          assertThat(stubScope, sameAs(scope), "Scope was not the same");
         });
 
         it("should invoke stub function with the same arguments", function() {
@@ -327,14 +332,14 @@ Screw.Unit(function() {
         });
 
         it("should return result of stub function", function() {
-          var exception;
+          var thrownException;
           try {
             mockFunc();
           } catch (err) {
-            exception = err;
+            thrownException = err;
           }
-          assertThat(exception, not(nil()), "Exception not thrown");
-          assertThat(exception, equalTo(exception));
+          assertThat(thrownException, not(nil()), "Exception not thrown");
+          assertThat(thrownException, sameAs(exception));
         });
       });
     });
@@ -365,11 +370,11 @@ Screw.Unit(function() {
         });
 
         it("should return undefined if insufficent arguments compared to stub", function() {
-          assertThat(mockFunc('foo', 9), equalTo(undefined));
+          assertThat(mockFunc('foo', 9), sameAs(undefined));
         });
 
         it("should return undefined if arguments do not match", function() {
-          assertThat(mockFunc('foo', 11, 'bar'), equalTo(undefined));
+          assertThat(mockFunc('foo', 11, 'bar'), sameAs(undefined));
         });
       });
 
