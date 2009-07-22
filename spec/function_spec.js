@@ -63,7 +63,7 @@ Screw.Unit(function() {
         }
         assertThat(exception, not(nil()), "Exception not raised");
         assertThat(exception, equalTo(
-          "Wanted but not invoked: func(), 'this' being anything"));
+          "Wanted but not invoked: func()"));
       });
     });
 
@@ -159,7 +159,7 @@ Screw.Unit(function() {
         }
         assertThat(exception, not(nil()), "Exception not raised");
         assertThat(exception, equalTo(
-          "Wanted but not invoked: func(<equal to 1>, <equal to \"boo\">, <equal to " + args[2] + ">, <anything>), 'this' being anything"));
+          "Wanted but not invoked: func(<equal to 1>, <equal to \"boo\">, <equal to " + args[2] + ">, <anything>)"));
       });
 
       it("should not verify function was invoked with args not matching matchers", function() {
@@ -171,7 +171,94 @@ Screw.Unit(function() {
         }
         assertThat(exception, not(nil()), "Exception not raised");
         assertThat(exception, equalTo(
-          "Wanted but not invoked: func(<equal to 1>, <equal to \"boo\">, <equal to " + args[2] + ">), 'this' being anything"));
+          "Wanted but not invoked: func(<equal to 1>, <equal to \"boo\">, <equal to " + args[2] + ">)"));
+      });
+    });
+
+    describe("when mock function is created with name", function() {
+      var mockFunc;
+      before(function() {
+        mockFunc = mockFunction('myfunctor');
+      });
+
+      it("should use defined name in verification failures", function() {
+        var exception;
+        try { 
+          verify(mockFunc)();
+        } catch (err) {
+          exception = err;
+        }
+        assertThat(exception, equalTo("Wanted but not invoked: myfunctor()"));
+      });
+    });
+
+    describe("when mock function is created with a default scope", function() {
+      var mockFunc;
+      var defaultScope;
+      before(function() {
+        defaultScope = this;
+        mockFunc = mockFunction(this);
+      });
+
+      describe("when stubbed without supplying scope", function() {
+        before(function() {
+          when(mockFunc)(1, 2).thenReturn('hello');
+        });
+
+        it("should apply to invocations with same scope different as default", function() {
+          assertThat(mockFunc.call(defaultScope, 1, 2), equalTo('hello'));
+        });
+
+        it("should not apply to invocations with scope different from default", function() {
+          assertThat(mockFunc.call({}, 1, 2), equalTo(undefined));
+        });
+      });
+
+      describe("when invocked without supplying scope", function() {
+        before(function() {
+          mockFunc(1, 'hi');
+        });
+
+        it("should verify with no scope", function() {
+          verify(mockFunc)(1, 'hi');
+        });
+
+        it("should verify with default scope", function() {
+          verify(mockFunc).apply(defaultScope, [1, 'hi']);
+        });
+
+        it("should not verify with different scope", function() {
+          var testScope = {};
+          var exception;
+          try { 
+            verify(mockFunc).call(testScope, 1, 'hi');
+          } catch (err) {
+            exception = err;
+          }
+          assertThat(exception, equalTo(
+            "Wanted but not invoked: func(<equal to 1>, <equal to \"hi\">), 'this' being equal to " + testScope));
+        });
+      });
+    });
+
+    describe("when mock function is created with name and default scope", function() {
+      var mockFunc;
+      var defaultScope;
+      before(function() {
+        defaultScope = this;
+        mockFunc = mockFunction('myfunctor', this);
+      });
+
+      it("should use defined name in verification failures", function() {
+        var exception;
+        var testScope = {};
+        try { 
+          verify(mockFunc).call(testScope);
+        } catch (err) {
+          exception = err;
+        }
+        assertThat(exception, equalTo(
+          "Wanted but not invoked: myfunctor(), 'this' being equal to " + testScope));
       });
     });
 

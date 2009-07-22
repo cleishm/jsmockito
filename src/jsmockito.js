@@ -35,10 +35,14 @@ JsMockito = {
     });
   },
 
+  toMatcher: function(obj) {
+    return JsHamcrest.isMatcher(obj)? obj :
+      JsHamcrest.Matchers.equalTo(obj);
+  },
+
   mapToMatchers: function(array) {
-    return JsMockito.map(array, function(matcher) {
-      return JsHamcrest.isMatcher(matcher)? matcher :
-        JsHamcrest.Matchers.equalTo(matcher);
+    return JsMockito.map(array, function(obj) {
+      return JsMockito.toMatcher(obj);
     });
   },
 

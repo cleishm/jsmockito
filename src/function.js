@@ -15,7 +15,15 @@
  *
  * @return {function} an anonymous function
  */
-JsMockito.mockFunction = function() {
+JsMockito.mockFunction = function(mockName, defaultScopeMatcher) {
+  if (typeof defaultScopeMatcher == 'undefined' && typeof mockName == 'object') {
+    defaultScopeMatcher = mockName;
+    mockName = undefined;
+  }
+  mockName = mockName || 'func';
+  defaultScopeMatcher = JsMockito.toMatcher(
+    defaultScopeMatcher || JsHamcrest.Matchers.anything());
+
   var stubMatchers = []
   var interactions = [];
 
@@ -68,7 +76,7 @@ JsMockito.mockFunction = function() {
     }
 
     var description = new JsHamcrest.Description();
-    description.append('Wanted but not invoked: func(');
+    description.append('Wanted but not invoked: ' + mockName + '(');
     JsMockito.each(matchers.splice(1), function(matcher, i) {
       if (i > 0)
         description.append(', ');
@@ -76,8 +84,11 @@ JsMockito.mockFunction = function() {
       matcher.describeTo(description);
       description.append('>');
     });
-    description.append("), 'this' being ");
-    matchers[0].describeTo(description);
+    description.append(")");
+    if (matchers[0] != defaultScopeMatcher) {
+      description.append(", 'this' being ");
+      matchers[0].describeTo(description);
+    }
     throw description.get();
   });
 
@@ -87,7 +98,7 @@ JsMockito.mockFunction = function() {
     // generate a function with overridden 'call' and 'apply' methods
     // to capture 'this' as a matcher for these cases
     var captureFunction = function() {
-      return captureFunction.apply(JsHamcrest.Matchers.anything(), 
+      return captureFunction.apply(defaultScopeMatcher,
         Array.prototype.slice.call(arguments, 0));
     };
     captureFunction.call = function(scope) {
