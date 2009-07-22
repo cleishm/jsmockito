@@ -44,6 +44,7 @@
         <concat destfile="${DIST}">
             <fileset dir="${SRC_DIR}" includes="jsmockito.js"/>
             <fileset dir="${SRC_DIR}" includes="function.js"/>
+            <fileset dir="${SRC_DIR}" includes="object.js"/>
         </concat>
         <replaceregexp match="@VERSION" replace="${VERSION}" flags="g" byline="true" file="${DIST}"/>
         <replaceregexp match="@DATE" replace="${DATE}" file="${DIST}"/>
