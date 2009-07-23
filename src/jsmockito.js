@@ -19,10 +19,22 @@ JsMockito = {
    */
   version: '@VERSION',
 
+  /**
+   * Add a stub for a mock object method or anonymous function
+   * @param mock A mock object or mock anonymous function
+   * @return {object or function} A stub builder on which the method or
+   * function to be stubbed can be invoked
+   */
   when: function(mock) {
     return mock._jsMockitoStubBuilder;
   },
 
+  /**
+   * Verify that a mock object method or anonymous function was invoked
+   * @param mock A mock object or mock anonymous function
+   * @return {object or function} A verifier on which the method or function to
+   *   be verified can be invoked
+   */
   verify: function(mock) {
     return mock._jsMockitoVerifier;
   },

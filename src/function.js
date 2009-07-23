@@ -13,6 +13,12 @@
  * JsMockito.verify(mockFunc)(1, greaterThan(2));
  * </pre>
  *
+ * @param mockName {string} The name of the mock function to use in messages
+ *   (defaults to 'func')
+ * @param defaultScopeMatcher {JsHamcrest.Matcher} A matcher to use for
+ *   asserting the 'this' argument for stub or verification invocations that do
+ *   not explicitly define it using call or apply (defaults to
+ *   JsHamcrest.Matchers.anything())
  * @return {function} an anonymous function
  */
 JsMockito.mockFunction = function(mockName, defaultScopeMatcher) {

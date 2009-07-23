@@ -26,7 +26,8 @@
  * JsMockito.verify(mockFunc)(1, 4); // will throw an exception
  * </pre>
  *
- * @return {function} an mock object
+ * @param Obj {function} the constructor for the object to be mocked
+ * @return {object} a mock object
  */
 JsMockito.mock = function(Obj) {
   var MockObject = function() { };
