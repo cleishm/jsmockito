@@ -58,17 +58,18 @@ Screw.Unit(function() {
           "Wanted but not invoked: obj.greeting(), 'this' being equal to " + testScope));
       });
 
+/*
       it("should verify that method was not invoked twice", function() {
-        verify(mockObj).greeting();
         var exception;
         try { 
-          verify(mockObj).greeting();
+          verify(mockObj, times(2)).greeting();
         } catch (err) {
           exception = err;
         }
         assertThat(exception, not(nil()), "Exception not raised");
         assertThat(exception, equalTo("Wanted but not invoked: obj.greeting()"));
       });
+*/
     });
 
     describe("when mock method invocked with multiple arguments", function() {

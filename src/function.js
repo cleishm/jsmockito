@@ -74,12 +74,11 @@ JsMockito.mockFunction = function(mockName, defaultScopeMatcher) {
   });
 
   mockFunc._jsMockitoVerifier = matcherCaptureFunction(function(matchers) {
-    for (var i = 0; i < interactions.length; i++) {
-      if (JsMockito.matchArray(matchers, interactions[i])) {
-        interactions.splice(i,1);
-        return;
-      }
-    }
+    var interaction = JsMockito.find(interactions, function(interaction) {
+      return JsMockito.matchArray(matchers, interaction);
+    });
+    if (interaction)
+      return;
 
     var description = new JsHamcrest.Description();
     description.append('Wanted but not invoked: ' + mockName + '(');

@@ -23,7 +23,7 @@ Screw.Unit(function() {
 
     describe("#verify", function() {
       describe("when never invoked", function() {
-        it("should not verify that mock function was invoked", function() {
+        it("should not verify that the mock function was invoked", function() {
           var exception;
           try { 
             verify(mockFunc)();
@@ -35,6 +35,10 @@ Screw.Unit(function() {
         });
 
 /*
+        it("should verify that the mock function was never invoked", function() {
+          verify(mockFunc, never())();
+        });
+
         it("should verify that mock function had zero interactions", function() {
           verifyZeroInteractions(mockFunc);
         });
@@ -59,6 +63,14 @@ Screw.Unit(function() {
         it("should verify mock function was invoked with scope matcher", function() {
           verify(mockFunc).call(sameAs(scope));
         });
+
+        it("should verify multiple times that mock function was invoked", function() {
+          verify(mockFunc)();
+          verify(mockFunc)();
+          verify(mockFunc).call(scope);
+          verify(mockFunc).apply(scope, []);
+        });
+
 
         it("should not verify function was invoked with different scope using call", function() {
           var exception;
@@ -86,11 +98,11 @@ Screw.Unit(function() {
             "Wanted but not invoked: func(), 'this' being equal to " + testScope));
         });
 
-        it("should not verify that mock function was invoked twice", function() {
-          verify(mockFunc)();
+/*
+        it("should not verify that the mock function was invoked more than once", function() {
           var exception;
           try { 
-            verify(mockFunc)();
+            verify(mockFunc, times(2))();
           } catch (err) {
             exception = err;
           }
@@ -98,8 +110,13 @@ Screw.Unit(function() {
           assertThat(exception, equalTo("Wanted but not invoked: func()"));
         });
 
-/*
-        it("should not verify that mock function had zero interactions", function() {
+        it("should verify that the mock function was never invoked with arguments", function() {
+          verify(mockFunc, never())('summer', 69);
+          verify(mockFunc, never())(lessThan(100));
+          verify(mockFunc, never())(anything());
+        });
+
+        it("should not verify that the mock function had zero interactions", function() {
           var exception;
           try { 
             verifyZeroInteractions(mockFunc);
@@ -124,14 +141,30 @@ Screw.Unit(function() {
           verify(mockFunc)();
           verify(mockFunc).call(scope);
         });
+
+/*
+        it("should verify that mock function was invoked twice", function() {
+          verify(mockFunc, times(2))();
+        });
+
+        it("should not verify that the mock function was invoked more than twice", function() {
+          var exception;
+          try { 
+            verify(mockFunc, times(3))();
+          } catch (err) {
+            exception = err;
+          }
+          assertThat(exception, not(nil()), "Exception not raised");
+          assertThat(exception, equalTo("Wanted but not invoked: func()"));
+        });
+*/
       });
 
       describe("when mock function invoked once with one argument", function() { 
         var scope;
-        var args = ['foo'];
         before(function() {
           scope = this;
-          mockFunc.apply(scope, args);
+          mockFunc.apply(scope, ['foo']);
         });
 
         it("should verify mock function was invoked", function() {
@@ -139,7 +172,9 @@ Screw.Unit(function() {
         });
 
         it("should verify mock function was invoked with arg", function() {
-          verify(mockFunc).apply(anything(), args);
+          verify(mockFunc).apply(anything(), ['foo']);
+          verify(mockFunc).call(scope, 'foo');
+          verify(mockFunc)(startsWith('f'));
         });
 
         it("should not verify function was invoked with different arg", function() {
@@ -172,11 +207,13 @@ Screw.Unit(function() {
         });
 
         it("should verify mock function was invoked with all args matching matchers", function() {
-          verify(mockFunc)(anything(), anything(), anything());
+          verify(mockFunc)(greaterThan(0), startsWith('te'), anything());
         });
 
         it("should verify mock function was invoked using less matchers than args", function() {
+          verify(mockFunc)(anything());
           verify(mockFunc).call(anything(), args[0]);
+          verify(mockFunc).apply(scope, [ lessThan(2) ]);
         });
 
         it("should not verify function was invoked using more matchers than args", function() {
