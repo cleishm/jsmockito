@@ -36,7 +36,7 @@ JsMockito = {
    *   be verified can be invoked
    */
   verify: function(mock) {
-    return mock._jsMockitoVerifier;
+    return mock._jsMockitoVerifierBuilder();
   },
 
   matchArray: function(matchers, array) {

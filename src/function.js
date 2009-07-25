@@ -73,29 +73,31 @@ JsMockito.mockFunction = function(mockName, defaultScopeMatcher) {
     };
   });
 
-  mockFunc._jsMockitoVerifier = matcherCaptureFunction(function(matchers) {
-    var interaction = JsMockito.find(interactions, function(interaction) {
-      return JsMockito.matchArray(matchers, interaction);
-    });
-    if (interaction)
-      return;
+  mockFunc._jsMockitoVerifierBuilder = function() {
+    return matcherCaptureFunction(function(matchers) {
+      var interaction = JsMockito.find(interactions, function(interaction) {
+        return JsMockito.matchArray(matchers, interaction);
+      });
+      if (interaction)
+        return;
 
-    var description = new JsHamcrest.Description();
-    description.append('Wanted but not invoked: ' + mockName + '(');
-    JsMockito.each(matchers.splice(1), function(matcher, i) {
-      if (i > 0)
-        description.append(', ');
-      description.append('<');
-      matcher.describeTo(description);
-      description.append('>');
+      var description = new JsHamcrest.Description();
+      description.append('Wanted but not invoked: ' + mockName + '(');
+      JsMockito.each(matchers.splice(1), function(matcher, i) {
+        if (i > 0)
+          description.append(', ');
+        description.append('<');
+        matcher.describeTo(description);
+        description.append('>');
+      });
+      description.append(")");
+      if (matchers[0] != defaultScopeMatcher) {
+        description.append(", 'this' being ");
+        matchers[0].describeTo(description);
+      }
+      throw description.get();
     });
-    description.append(")");
-    if (matchers[0] != defaultScopeMatcher) {
-      description.append(", 'this' being ");
-      matchers[0].describeTo(description);
-    }
-    throw description.get();
-  });
+  };
 
   return mockFunc;
 
