@@ -52,28 +52,30 @@ JsMockito.mockFunction = function(mockName, defaultScopeMatcher) {
     return stub.apply(this, arguments);
   };
 
-  mockFunc._jsMockitoStubBuilder = matcherCaptureFunction(function(matchers) {
-    var stubMatch = [matchers, []];
-    stubMatchers.push(stubMatch);
-    return {
-      then: function() {
-        stubMatch[1].push.apply(stubMatch[1], arguments);
-        return this;
-      },
-      thenReturn: function() {
-        this.then.apply(this, JsMockito.map(arguments, function(value) {
-          return function() { return value };
-        }));
-      },
-      thenThrow: function(exception) {
-        this.then.apply(this, JsMockito.map(arguments, function(value) {
-          return function() { throw value };
-        }));
-      }
-    };
-  });
+  mockFunc._jsMockitoStubBuilder = function() {
+    return matcherCaptureFunction(function(matchers) {
+      var stubMatch = [matchers, []];
+      stubMatchers.push(stubMatch);
+      return {
+        then: function() {
+          stubMatch[1].push.apply(stubMatch[1], arguments);
+          return this;
+        },
+        thenReturn: function() {
+          this.then.apply(this, JsMockito.map(arguments, function(value) {
+            return function() { return value };
+          }));
+        },
+        thenThrow: function(exception) {
+          this.then.apply(this, JsMockito.map(arguments, function(value) {
+            return function() { throw value };
+          }));
+        }
+      };
+    });
+  };
 
-  mockFunc._jsMockitoVerifierBuilder = function() {
+  mockFunc._jsMockitoVerifier = function() {
     return matcherCaptureFunction(function(matchers) {
       var interaction = JsMockito.find(interactions, function(interaction) {
         return JsMockito.matchArray(matchers, interaction);

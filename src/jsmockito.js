@@ -26,7 +26,7 @@ JsMockito = {
    * function to be stubbed can be invoked
    */
   when: function(mock) {
-    return mock._jsMockitoStubBuilder;
+    return mock._jsMockitoStubBuilder();
   },
 
   /**
@@ -36,7 +36,7 @@ JsMockito = {
    *   be verified can be invoked
    */
   verify: function(mock) {
-    return mock._jsMockitoVerifierBuilder();
+    return mock._jsMockitoVerifier();
   },
 
   matchArray: function(matchers, array) {

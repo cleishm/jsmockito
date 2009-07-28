@@ -35,23 +35,31 @@ JsMockito.mock = function(Obj) {
   MockObject.prototype.constructor = MockObject;
 
   var mockObject = new MockObject();
-  mockObject._jsMockitoStubBuilder = {};
-  var verifierBuilders = {};
+  var stubBuilders = {};
+  var verifiers = {};
 
   for (var name in mockObject) (function(name) {
     if (name == 'constructor')
       return;
     mockObject[name] = JsMockito.mockFunction('obj.' + name, mockObject);
-    mockObject._jsMockitoStubBuilder[name] = mockObject[name]._jsMockitoStubBuilder;
-    verifierBuilders[name] = mockObject[name]._jsMockitoVerifierBuilder;
+    stubBuilders[name] = mockObject[name]._jsMockitoStubBuilder;
+    verifiers[name] = mockObject[name]._jsMockitoVerifier;
   })(name);
 
-  mockObject._jsMockitoVerifierBuilder = function() {
-    var verifiers = {};
-    for (var name in verifierBuilders) {
-      verifiers[name] = verifierBuilders[name]();
+  mockObject._jsMockitoStubBuilder = function() {
+    var stubBuilderObject = new MockObject();
+    for (var name in stubBuilders) {
+      stubBuilderObject[name] = stubBuilders[name]();
     }
-    return verifiers;
+    return stubBuilderObject;
+  }
+
+  mockObject._jsMockitoVerifier = function() {
+    var verifierObject = new MockObject();
+    for (var name in verifiers) {
+      verifierObject[name] = verifiers[name]();
+    }
+    return verifierObject;
   }
 
   return mockObject;

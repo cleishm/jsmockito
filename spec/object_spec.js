@@ -19,6 +19,16 @@ Screw.Unit(function() {
       it("should be an instance of the same class", function() {
         assertThat(mockObj, instanceOf(MyObject));
       });
+
+      it("should provide an instance of the same class when stubbing", function() {
+        var stubBuilder = when(mockObj);
+        assertThat(stubBuilder, instanceOf(MyObject));
+      });
+
+      it("should provide an instance of the same class when verifing", function() {
+        var verifier = verify(mockObj);
+        assertThat(verifier, instanceOf(MyObject));
+      });
     });
 
     describe("when mock method invoked once with no arguments", function() { 
