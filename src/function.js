@@ -15,20 +15,20 @@
  *
  * @param mockName {string} The name of the mock function to use in messages
  *   (defaults to 'func')
- * @param defaultScopeMatcher {JsHamcrest.Matcher} A matcher to use for
+ * @param defaultContextMatcher {JsHamcrest.Matcher} A matcher to use for
  *   asserting the 'this' argument for stub or verification invocations that do
  *   not explicitly define it using call or apply (defaults to
  *   JsHamcrest.Matchers.anything())
  * @return {function} an anonymous function
  */
-JsMockito.mockFunction = function(mockName, defaultScopeMatcher) {
-  if (typeof defaultScopeMatcher == 'undefined' && typeof mockName == 'object') {
-    defaultScopeMatcher = mockName;
+JsMockito.mockFunction = function(mockName, defaultContextMatcher) {
+  if (typeof defaultContextMatcher == 'undefined' && typeof mockName == 'object') {
+    defaultContextMatcher = mockName;
     mockName = undefined;
   }
   mockName = mockName || 'func';
-  defaultScopeMatcher = JsMockito.toMatcher(
-    defaultScopeMatcher || JsHamcrest.Matchers.anything());
+  defaultContextMatcher = JsMockito.toMatcher(
+    defaultContextMatcher || JsHamcrest.Matchers.anything());
 
   var stubMatchers = []
   var interactions = [];
@@ -93,7 +93,7 @@ JsMockito.mockFunction = function(mockName, defaultScopeMatcher) {
         description.append('>');
       });
       description.append(")");
-      if (matchers[0] != defaultScopeMatcher) {
+      if (matchers[0] != defaultContextMatcher) {
         description.append(", 'this' being ");
         matchers[0].describeTo(description);
       }
@@ -107,15 +107,15 @@ JsMockito.mockFunction = function(mockName, defaultScopeMatcher) {
     // generate a function with overridden 'call' and 'apply' methods
     // to capture 'this' as a matcher for these cases
     var captureFunction = function() {
-      return captureFunction.apply(defaultScopeMatcher,
+      return captureFunction.apply(defaultContextMatcher,
         Array.prototype.slice.call(arguments, 0));
     };
-    captureFunction.call = function(scope) {
-      return captureFunction.apply(scope,
+    captureFunction.call = function(context) {
+      return captureFunction.apply(context,
         Array.prototype.slice.call(arguments, 1));
     };
-    captureFunction.apply = function(scope, args) {
-      var matchers = JsMockito.mapToMatchers([scope].concat(args || []));
+    captureFunction.apply = function(context, args) {
+      var matchers = JsMockito.mapToMatchers([context].concat(args || []));
       return handler(matchers);
     };
     return captureFunction;

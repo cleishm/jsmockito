@@ -46,9 +46,9 @@ Screw.Unit(function() {
       });
 
       describe("when mock function invoked once with no arguments", function() { 
-        var scope;
+        var context;
         before(function() {
-          scope = this;
+          context = this;
           mockFunc();
         });
 
@@ -56,45 +56,45 @@ Screw.Unit(function() {
           verify(mockFunc)();
         });
 
-        it("should verify mock function was invoked with scope", function() {
-          verify(mockFunc).call(scope);
+        it("should verify mock function was invoked with context", function() {
+          verify(mockFunc).call(context);
         });
 
-        it("should verify mock function was invoked with scope matcher", function() {
-          verify(mockFunc).call(sameAs(scope));
+        it("should verify mock function was invoked with context matcher", function() {
+          verify(mockFunc).call(sameAs(context));
         });
 
         it("should verify multiple times that mock function was invoked", function() {
           verify(mockFunc)();
           verify(mockFunc)();
-          verify(mockFunc).call(scope);
-          verify(mockFunc).apply(scope, []);
+          verify(mockFunc).call(context);
+          verify(mockFunc).apply(context, []);
         });
 
-        it("should not verify function was invoked with different scope using call", function() {
+        it("should not verify function was invoked with different context using call", function() {
           var exception;
-          var testScope = {};
+          var testContext = {};
           try {
-            verify(mockFunc).call(testScope);
+            verify(mockFunc).call(testContext);
           } catch (err) {
             exception = err;
           }
           assertThat(exception, not(nil()), "Exception not raised");
           assertThat(exception, equalTo(
-            "Wanted but not invoked: func(), 'this' being equal to " + testScope));
+            "Wanted but not invoked: func(), 'this' being equal to " + testContext));
         });
 
-        it("should not verify function was invoked with different scope using apply", function() {
+        it("should not verify function was invoked with different context using apply", function() {
           var exception;
-          var testScope = {};
+          var testContext = {};
           try {
-            verify(mockFunc).apply(testScope);
+            verify(mockFunc).apply(testContext);
           } catch (err) {
             exception = err;
           }
           assertThat(exception, not(nil()), "Exception not raised");
           assertThat(exception, equalTo(
-            "Wanted but not invoked: func(), 'this' being equal to " + testScope));
+            "Wanted but not invoked: func(), 'this' being equal to " + testContext));
         });
 
         it("should not verify function was invoked with arguments", function() {
@@ -178,9 +178,9 @@ Screw.Unit(function() {
 
 /*
       describe("when mock function invoked twice with no arguments", function() { 
-        var scope;
+        var context;
         before(function() {
-          scope = this;
+          context = this;
           mockFunc();
           mockFunc();
         });
@@ -214,10 +214,10 @@ Screw.Unit(function() {
 */
 
       describe("when mock function invoked once with one argument", function() { 
-        var scope;
+        var context;
         before(function() {
-          scope = this;
-          mockFunc.apply(scope, ['foo']);
+          context = this;
+          mockFunc.apply(context, ['foo']);
         });
 
         it("should verify mock function was invoked", function() {
@@ -226,29 +226,29 @@ Screw.Unit(function() {
 
         it("should verify mock function was invoked with arg", function() {
           verify(mockFunc).apply(anything(), ['foo']);
-          verify(mockFunc).call(scope, 'foo');
+          verify(mockFunc).call(context, 'foo');
           verify(mockFunc)(startsWith('f'));
         });
 
         it("should not verify function was invoked with different arg", function() {
           var exception;
           try { 
-            verify(mockFunc).call(scope, 'bar');
+            verify(mockFunc).call(context, 'bar');
           } catch (err) {
             exception = err;
           }
           assertThat(exception, not(nil()), "Exception not raised");
           assertThat(exception, equalTo(
-            "Wanted but not invoked: func(<equal to \"bar\">), 'this' being equal to " + scope));
+            "Wanted but not invoked: func(<equal to \"bar\">), 'this' being equal to " + context));
         });
       });
 
       describe("when mock function invoked once with multiple arguments", function() { 
-        var scope;
+        var context;
         var args = [1, 'test', {}];
         before(function() {
-          scope = this;
-          mockFunc.apply(scope, args);
+          context = this;
+          mockFunc.apply(context, args);
         });
 
         it("should verify mock function was invoked", function() {
@@ -256,7 +256,7 @@ Screw.Unit(function() {
         });
 
         it("should verify mock function was invoked with all args the same", function() {
-          verify(mockFunc).apply(scope, args);
+          verify(mockFunc).apply(context, args);
         });
 
         it("should verify mock function was invoked with all args matching matchers", function() {
@@ -266,7 +266,7 @@ Screw.Unit(function() {
         it("should verify mock function was invoked using less matchers than args", function() {
           verify(mockFunc)(anything());
           verify(mockFunc).call(anything(), args[0]);
-          verify(mockFunc).apply(scope, [ lessThan(2) ]);
+          verify(mockFunc).apply(context, [ lessThan(2) ]);
         });
 
         it("should not verify function was invoked using more matchers than args", function() {
@@ -308,11 +308,11 @@ Screw.Unit(function() {
         });
 
         describe("when using 'then' and a function stub", function() {
-          var stubScope;
+          var stubContext;
           var stubArguments;
           before(function() {
             when(mockFunc)().then(function() {
-              stubScope = this;
+              stubContext = this;
               stubArguments = arguments;
               return 'stub result';
             });
@@ -327,16 +327,16 @@ Screw.Unit(function() {
             assertThat(stubArguments, not(nil()));
           });
 
-          it("should invoke stub function with the same default scope", function() {
-            var scope = this;
+          it("should invoke stub function with the same default context", function() {
+            var context = this;
             mockFunc();
-            assertThat(stubScope, sameAs(scope), "Scope was not the same");
+            assertThat(stubContext, sameAs(context), "Context was not the same");
           });
 
-          it("should invoke stub function with the same explicit scope", function() {
-            var scope = {};
-            mockFunc.call(scope, 1, 'foo');
-            assertThat(stubScope, sameAs(scope), "Scope was not the same");
+          it("should invoke stub function with the same explicit context", function() {
+            var context = {};
+            mockFunc.call(context, 1, 'foo');
+            assertThat(stubContext, sameAs(context), "Context was not the same");
           });
 
           it("should invoke stub function with the same arguments", function() {
@@ -377,7 +377,7 @@ Screw.Unit(function() {
       describe("when mock function is stubbed with multiple arguments", function() {
         var stubInvoked = false;
 
-        describe("when stubbing without scope matcher", function() {
+        describe("when stubbing without context matcher", function() {
           before(function() {
             when(mockFunc)('foo', lessThan(10), anything()).then(function() { stubInvoked = true; return 'stub result' });
           });
@@ -404,34 +404,34 @@ Screw.Unit(function() {
           });
         });
 
-        describe("when stubbing with scope matcher via call", function() {
-          var scope = {};
+        describe("when stubbing with context matcher via call", function() {
+          var context = {};
           before(function() {
-            when(mockFunc).call(scope, 1).then(function() { stubInvoked = true; return 'stub result' });
+            when(mockFunc).call(context, 1).then(function() { stubInvoked = true; return 'stub result' });
           });
 
           it("should return result of stub function", function() {
-            assertThat(mockFunc.call(scope, 1, 2), equalTo('stub result'));
+            assertThat(mockFunc.call(context, 1, 2), equalTo('stub result'));
           });
 
           it("should invoke stub function when called", function() {
-            mockFunc.apply(scope, [1, 'fred']);
+            mockFunc.apply(context, [1, 'fred']);
             assertThat(stubInvoked, truth());
           });
         });
 
-        describe("when stubbing with scope matcher via apply", function() {
-          var scope = {};
+        describe("when stubbing with context matcher via apply", function() {
+          var context = {};
           before(function() {
-            when(mockFunc).apply(scope, [1]).then(function() { stubInvoked = true; return 'stub result' });
+            when(mockFunc).apply(context, [1]).then(function() { stubInvoked = true; return 'stub result' });
           });
 
           it("should return result of stub function", function() {
-            assertThat(mockFunc.call(scope, 1, 2), equalTo('stub result'));
+            assertThat(mockFunc.call(context, 1, 2), equalTo('stub result'));
           });
 
           it("should invoke stub function when called", function() {
-            mockFunc.apply(scope, [1, 'fred']);
+            mockFunc.apply(context, [1, 'fred']);
             assertThat(stubInvoked, truth());
           });
         });
@@ -554,73 +554,73 @@ Screw.Unit(function() {
       });
     });
 
-    describe("when mock function is created with a default scope", function() {
+    describe("when mock function is created with a default context", function() {
       var mockFunc;
-      var defaultScope;
+      var defaultContext;
       before(function() {
-        defaultScope = this;
+        defaultContext = this;
         mockFunc = mockFunction(this);
       });
 
-      describe("when stubbed without supplying scope", function() {
+      describe("when stubbed without supplying context", function() {
         before(function() {
           when(mockFunc)(1, 2).thenReturn('hello');
         });
 
-        it("should apply to invocations with same scope different as default", function() {
-          assertThat(mockFunc.call(defaultScope, 1, 2), equalTo('hello'));
+        it("should apply to invocations with same context different as default", function() {
+          assertThat(mockFunc.call(defaultContext, 1, 2), equalTo('hello'));
         });
 
-        it("should not apply to invocations with scope different from default", function() {
+        it("should not apply to invocations with context different from default", function() {
           assertThat(mockFunc.call({}, 1, 2), sameAs(undefined));
         });
       });
 
-      describe("when invocked without supplying scope", function() {
+      describe("when invocked without supplying context", function() {
         before(function() {
           mockFunc(1, 'hi');
         });
 
-        it("should verify with no scope", function() {
+        it("should verify with no context", function() {
           verify(mockFunc)(1, 'hi');
         });
 
-        it("should verify with default scope", function() {
-          verify(mockFunc).apply(defaultScope, [1, 'hi']);
+        it("should verify with default context", function() {
+          verify(mockFunc).apply(defaultContext, [1, 'hi']);
         });
 
-        it("should not verify with different scope", function() {
-          var testScope = {};
+        it("should not verify with different context", function() {
+          var testContext = {};
           var exception;
           try { 
-            verify(mockFunc).call(testScope, 1, 'hi');
+            verify(mockFunc).call(testContext, 1, 'hi');
           } catch (err) {
             exception = err;
           }
           assertThat(exception, equalTo(
-            "Wanted but not invoked: func(<equal to 1>, <equal to \"hi\">), 'this' being equal to " + testScope));
+            "Wanted but not invoked: func(<equal to 1>, <equal to \"hi\">), 'this' being equal to " + testContext));
         });
       });
     });
 
-    describe("when mock function is created with name and default scope", function() {
+    describe("when mock function is created with name and default context", function() {
       var mockFunc;
-      var defaultScope;
+      var defaultContext;
       before(function() {
-        defaultScope = this;
+        defaultContext = this;
         mockFunc = mockFunction('myfunctor', this);
       });
 
       it("should use defined name in verification failures", function() {
         var exception;
-        var testScope = {};
+        var testContext = {};
         try { 
-          verify(mockFunc).call(testScope);
+          verify(mockFunc).call(testContext);
         } catch (err) {
           exception = err;
         }
         assertThat(exception, equalTo(
-          "Wanted but not invoked: myfunctor(), 'this' being equal to " + testScope));
+          "Wanted but not invoked: myfunctor(), 'this' being equal to " + testContext));
       });
     });
   });

@@ -47,25 +47,25 @@ Screw.Unit(function() {
         verify(mockObj).greeting();
       });
 
-      it("should verify method was invoked with scope", function() {
+      it("should verify method was invoked with context", function() {
         verify(mockObj).greeting.call(mockObj);
       });
 
-      it("should verify method was invocked using scope matcher", function() {
+      it("should verify method was invocked using context matcher", function() {
         verify(mockObj).greeting.apply(anything(), []);
       });
 
-      it("should not verify method was invoked with different scope", function() {
+      it("should not verify method was invoked with different context", function() {
         var exception;
-        var testScope = {};
+        var testContext = {};
         try {
-          verify(mockObj).greeting.call(testScope);
+          verify(mockObj).greeting.call(testContext);
         } catch (err) {
           exception = err;
         }
         assertThat(exception, not(nil()), "Exception not raised");
         assertThat(exception, equalTo(
-          "Wanted but not invoked: obj.greeting(), 'this' being equal to " + testScope));
+          "Wanted but not invoked: obj.greeting(), 'this' being equal to " + testContext));
       });
 
 /*
@@ -130,17 +130,17 @@ Screw.Unit(function() {
       });
     });
 
-    describe("when mock method invocked with different scope", function() {
+    describe("when mock method invocked with different context", function() {
       var mockObj;
-      var testScope = {};
+      var testContext = {};
       before(function() {
         mockObj = mock(MyObject);
-        mockObj.greeting.call(testScope);
+        mockObj.greeting.call(testContext);
       });
 
-      it("should not verify that the method was invoked without explicit scope", function() {
+      it("should not verify that the method was invoked without explicit context", function() {
         var exception;
-        var testScope = {};
+        var testContext = {};
         try {
           verify(mockObj).greeting();
         } catch (err) {
@@ -150,8 +150,8 @@ Screw.Unit(function() {
         assertThat(exception, equalTo("Wanted but not invoked: obj.greeting()"));
       });
 
-      it("should verify method was invoked with explicit scope", function() {
-        verify(mockObj).greeting.apply(testScope, []);
+      it("should verify method was invoked with explicit context", function() {
+        verify(mockObj).greeting.apply(testContext, []);
       });
     });
 
@@ -161,16 +161,16 @@ Screw.Unit(function() {
         mockObj = mock(MyObject);
       });
 
-      var stubScope;
+      var stubContext;
       var stubArguments;
       function stubFunction() {
-        stubScope = this;
+        stubContext = this;
         stubArguments = arguments;
         return 'stub result';
       }
 
       after(function() {
-        stubScope = undefined;
+        stubContext = undefined;
         stubArguments = undefined;
       });
 
@@ -199,9 +199,9 @@ Screw.Unit(function() {
             assertThat(stubArguments, not(nil()));
           });
 
-          it("should invoke stub function with the mock as scope by default", function() {
+          it("should invoke stub function with the mock as context by default", function() {
             mockObj.greeting();
-            assertThat(stubScope, sameAs(mockObj), "Scope was not the same");
+            assertThat(stubContext, sameAs(mockObj), "Context was not the same");
           });
 
           it("should invoke stub function with the same arguments", function() {
@@ -209,20 +209,20 @@ Screw.Unit(function() {
             assertThat(stubArguments, equalTo(['hello', undefined, 5]));
           });
 
-          it("should invoke stub function when invoked via call with object as scope", function() {
+          it("should invoke stub function when invoked via call with object as context", function() {
             mockObj.greeting.call(mockObj);
-            assertThat(stubScope, sameAs(mockObj), "Scope was not the same");
+            assertThat(stubContext, sameAs(mockObj), "Context was not the same");
           });
 
-          it("should invoke stub function when invoked via apply with object as scope", function() {
+          it("should invoke stub function when invoked via apply with object as context", function() {
             mockObj.greeting.apply(mockObj, ['hello', 6]);
-            assertThat(stubScope, sameAs(mockObj), "Scope was not the same");
+            assertThat(stubContext, sameAs(mockObj), "Context was not the same");
             assertThat(stubArguments, equalTo(['hello', 6]));
           });
 
-          it("should not invoke stub function when invoked via call with different scope", function() {
+          it("should not invoke stub function when invoked via call with different context", function() {
             assertThat(mockObj.greeting.call({}), sameAs(undefined));
-            assertThat(stubScope, sameAs(undefined));
+            assertThat(stubContext, sameAs(undefined));
           });
         });
       });
@@ -249,15 +249,15 @@ Screw.Unit(function() {
         });
       });
     
-      describe("when stubbing a method with explit scope matcher and 'then' clause", function() {
+      describe("when stubbing a method with explit context matcher and 'then' clause", function() {
         before(function() {
           when(mockObj).greeting.call(anything()).then(stubFunction);
         });
 
-        it("should invoke stub function with the same explicit scope", function() {
-          var scope = {};
-          mockObj.greeting.call(scope, 1, 'foo');
-          assertThat(stubScope, sameAs(scope), "Scope was not the same");
+        it("should invoke stub function with the same explicit context", function() {
+          var context = {};
+          mockObj.greeting.call(context, 1, 'foo');
+          assertThat(stubContext, sameAs(context), "Context was not the same");
         });
       });
     });
