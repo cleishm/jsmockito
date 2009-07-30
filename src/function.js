@@ -15,20 +15,10 @@
  *
  * @param mockName {string} The name of the mock function to use in messages
  *   (defaults to 'func')
- * @param contextMatcher {JsHamcrest.Matcher} A matcher to use for
- *   asserting the 'this' argument for stub or verification invocations that do
- *   not explicitly define it using call or apply (defaults to
- *   JsHamcrest.Matchers.anything())
  * @return {function} an anonymous function
  */
-JsMockito.mockFunction = function(mockName, contextMatcher) {
-  if (typeof contextMatcher == 'undefined' && typeof mockName == 'object') {
-    contextMatcher = mockName;
-    mockName = undefined;
-  }
+JsMockito.mockFunction = function(mockName) {
   mockName = mockName || 'func';
-  contextMatcher = JsMockito.toMatcher(
-    contextMatcher || JsHamcrest.Matchers.anything());
 
   var stubMatchers = []
   var interactions = [];
@@ -52,8 +42,8 @@ JsMockito.mockFunction = function(mockName, contextMatcher) {
     return stub.apply(this, arguments);
   };
 
-  mockFunc._jsMockitoStubBuilder = function() {
-    return matcherCaptureFunction(function(matchers) {
+  mockFunc._jsMockitoStubBuilder = function(contextMatcher) {
+    return matcherCaptureFunction(contextMatcher, function(matchers) {
       var stubMatch = [matchers, []];
       stubMatchers.push(stubMatch);
       return {
@@ -75,15 +65,15 @@ JsMockito.mockFunction = function(mockName, contextMatcher) {
     });
   };
 
-  mockFunc._jsMockitoVerifier = function(validator) {
-    return matcherCaptureFunction(function(matchers) {
+  mockFunc._jsMockitoVerifier = function(contextMatcher, validator) {
+    return matcherCaptureFunction(contextMatcher, function(matchers) {
       return validator(interactions, matchers, mockName, matchers[0] != contextMatcher);
     });
   };
 
   return mockFunc;
 
-  function matcherCaptureFunction(handler) {
+  function matcherCaptureFunction(contextMatcher, handler) {
     return JsMockito.contextCaptureFunction(contextMatcher,
       function(context, args) {
         var matchers = JsMockito.mapToMatchers([context].concat(args || []));

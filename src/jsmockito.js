@@ -26,7 +26,7 @@ JsMockito = {
    * function to be stubbed can be invoked
    */
   when: function(mock) {
-    return mock._jsMockitoStubBuilder();
+    return mock._jsMockitoStubBuilder(JsHamcrest.Matchers.anything());
   },
 
   /**
@@ -36,7 +36,9 @@ JsMockito = {
    *   be verified can be invoked
    */
   verify: function(mock) {
-    return mock._jsMockitoVerifier(JsMockito.validators.once());
+    return mock._jsMockitoVerifier(
+      JsHamcrest.Matchers.anything(),
+      JsMockito.validators.once());
   },
 
   contextCaptureFunction: function(defaultContext, handler) {

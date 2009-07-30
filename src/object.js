@@ -37,6 +37,8 @@ JsMockito.mock = function(Obj) {
   var mockObject = new MockObject();
   var stubBuilders = {};
   var verifiers = {};
+  
+  var contextMatcher = JsHamcrest.Matchers.equalTo(mockObject);
 
   for (var name in mockObject) (function(name) {
     if (name == 'constructor')
@@ -47,17 +49,23 @@ JsMockito.mock = function(Obj) {
   })(name);
 
   mockObject._jsMockitoStubBuilder = function() {
+    var delegateArgs = [contextMatcher].concat(
+      Array.prototype.slice.call(arguments, 1));
+
     var stubBuilderObject = new MockObject();
     for (var name in stubBuilders) {
-      stubBuilderObject[name] = stubBuilders[name].apply(this, arguments);
+      stubBuilderObject[name] = stubBuilders[name].apply(this, delegateArgs);
     }
     return stubBuilderObject;
   }
 
   mockObject._jsMockitoVerifier = function() {
+    var delegateArgs = [contextMatcher].concat(
+      Array.prototype.slice.call(arguments, 1));
+
     var verifierObject = new MockObject();
     for (var name in verifiers) {
-      verifierObject[name] = verifiers[name].apply(this, arguments);
+      verifierObject[name] = verifiers[name].apply(this, delegateArgs);
     }
     return verifierObject;
   }
