@@ -49,7 +49,7 @@ JsMockito.mock = function(Obj) {
   mockObject._jsMockitoStubBuilder = function() {
     var stubBuilderObject = new MockObject();
     for (var name in stubBuilders) {
-      stubBuilderObject[name] = stubBuilders[name]();
+      stubBuilderObject[name] = stubBuilders[name].apply(this, arguments);
     }
     return stubBuilderObject;
   }
@@ -57,7 +57,7 @@ JsMockito.mock = function(Obj) {
   mockObject._jsMockitoVerifier = function() {
     var verifierObject = new MockObject();
     for (var name in verifiers) {
-      verifierObject[name] = verifiers[name]();
+      verifierObject[name] = verifiers[name].apply(this, arguments);
     }
     return verifierObject;
   }

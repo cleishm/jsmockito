@@ -36,7 +36,25 @@ JsMockito = {
    *   be verified can be invoked
    */
   verify: function(mock) {
-    return mock._jsMockitoVerifier();
+    return mock._jsMockitoVerifier(JsMockito.validators.once());
+  },
+
+  contextCaptureFunction: function(defaultContext, handler) {
+    // generate a function with overridden 'call' and 'apply' methods
+    // and apply a default context when these are not used to supply
+    // one explictly.
+    var captureFunction = function() {
+      return captureFunction.apply(defaultContext,
+        Array.prototype.slice.call(arguments, 0));
+    };
+    captureFunction.call = function(context) {
+      return captureFunction.apply(context,
+        Array.prototype.slice.call(arguments, 1));
+    };
+    captureFunction.apply = function(context, args) {
+      return handler.apply(this, [ context, args||[] ]);
+    };
+    return captureFunction;
   },
 
   matchArray: function(matchers, array) {

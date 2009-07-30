@@ -140,7 +140,6 @@ Screw.Unit(function() {
 
       it("should not verify that the method was invoked without explicit context", function() {
         var exception;
-        var testContext = {};
         try {
           verify(mockObj).greeting();
         } catch (err) {

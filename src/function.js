@@ -15,20 +15,20 @@
  *
  * @param mockName {string} The name of the mock function to use in messages
  *   (defaults to 'func')
- * @param defaultContextMatcher {JsHamcrest.Matcher} A matcher to use for
+ * @param contextMatcher {JsHamcrest.Matcher} A matcher to use for
  *   asserting the 'this' argument for stub or verification invocations that do
  *   not explicitly define it using call or apply (defaults to
  *   JsHamcrest.Matchers.anything())
  * @return {function} an anonymous function
  */
-JsMockito.mockFunction = function(mockName, defaultContextMatcher) {
-  if (typeof defaultContextMatcher == 'undefined' && typeof mockName == 'object') {
-    defaultContextMatcher = mockName;
+JsMockito.mockFunction = function(mockName, contextMatcher) {
+  if (typeof contextMatcher == 'undefined' && typeof mockName == 'object') {
+    contextMatcher = mockName;
     mockName = undefined;
   }
   mockName = mockName || 'func';
-  defaultContextMatcher = JsMockito.toMatcher(
-    defaultContextMatcher || JsHamcrest.Matchers.anything());
+  contextMatcher = JsMockito.toMatcher(
+    contextMatcher || JsHamcrest.Matchers.anything());
 
   var stubMatchers = []
   var interactions = [];
@@ -75,49 +75,20 @@ JsMockito.mockFunction = function(mockName, defaultContextMatcher) {
     });
   };
 
-  mockFunc._jsMockitoVerifier = function() {
+  mockFunc._jsMockitoVerifier = function(validator) {
     return matcherCaptureFunction(function(matchers) {
-      var interaction = JsMockito.find(interactions, function(interaction) {
-        return JsMockito.matchArray(matchers, interaction);
-      });
-      if (interaction)
-        return;
-
-      var description = new JsHamcrest.Description();
-      description.append('Wanted but not invoked: ' + mockName + '(');
-      JsMockito.each(matchers.splice(1), function(matcher, i) {
-        if (i > 0)
-          description.append(', ');
-        description.append('<');
-        matcher.describeTo(description);
-        description.append('>');
-      });
-      description.append(")");
-      if (matchers[0] != defaultContextMatcher) {
-        description.append(", 'this' being ");
-        matchers[0].describeTo(description);
-      }
-      throw description.get();
+      return validator(interactions, matchers, mockName, matchers[0] != contextMatcher);
     });
   };
 
   return mockFunc;
 
   function matcherCaptureFunction(handler) {
-    // generate a function with overridden 'call' and 'apply' methods
-    // to capture 'this' as a matcher for these cases
-    var captureFunction = function() {
-      return captureFunction.apply(defaultContextMatcher,
-        Array.prototype.slice.call(arguments, 0));
-    };
-    captureFunction.call = function(context) {
-      return captureFunction.apply(context,
-        Array.prototype.slice.call(arguments, 1));
-    };
-    captureFunction.apply = function(context, args) {
-      var matchers = JsMockito.mapToMatchers([context].concat(args || []));
-      return handler(matchers);
-    };
-    return captureFunction;
+    return JsMockito.contextCaptureFunction(contextMatcher,
+      function(context, args) {
+        var matchers = JsMockito.mapToMatchers([context].concat(args || []));
+        return handler(matchers);
+      }
+    );
   };
 };
