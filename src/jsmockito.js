@@ -35,9 +35,9 @@ JsMockito = {
    * @return {object or function} A verifier on which the method or function to
    *   be verified can be invoked
    */
-  verify: function(mock, validator) {
-    validator = validator || JsMockito.validators.once();
-    return mock._jsMockitoVerifier(JsHamcrest.Matchers.anything(), validator);
+  verify: function(mock, verifier) {
+    verifier = verifier || JsMockito.verifiers.once();
+    return mock._jsMockitoVerifier(JsHamcrest.Matchers.anything(), verifier);
   },
 
   contextCaptureFunction: function(defaultContext, handler) {

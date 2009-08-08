@@ -1,6 +1,6 @@
 // vi:ts=2 sw=2 expandtab
 
-JsMockito.validators = {
+JsMockito.verifiers = {
   never: function() {
     return function(interactions, matchers, mockName, withContext) {
       var interaction = JsMockito.find(interactions, function(interaction) {

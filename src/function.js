@@ -65,9 +65,9 @@ JsMockito.mockFunction = function(mockName) {
     });
   };
 
-  mockFunc._jsMockitoVerifier = function(contextMatcher, validator) {
+  mockFunc._jsMockitoVerifier = function(contextMatcher, verifier) {
     return matcherCaptureFunction(contextMatcher, function(matchers) {
-      return validator(interactions, matchers, mockName, matchers[0] != contextMatcher);
+      return verifier(interactions, matchers, mockName, matchers[0] != contextMatcher);
     });
   };
 
