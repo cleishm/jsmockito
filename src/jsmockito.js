@@ -36,8 +36,7 @@ JsMockito = {
    *   be verified can be invoked
    */
   verify: function(mock, verifier) {
-    verifier = verifier || JsMockito.verifiers.once();
-    return mock._jsMockitoVerifier(JsHamcrest.Matchers.anything(), verifier);
+    return (verifier || JsMockito.verifiers.once()).verify(mock);
   },
 
   contextCaptureFunction: function(defaultContext, handler) {
@@ -98,5 +97,19 @@ JsMockito = {
 
   any: function(array, callback) {
     return (this.find(array, callback) != undefined);
+  },
+
+  extend: function(dstObject, srcObject) {
+    for (var prop in srcObject) {
+      dstObject[prop] = srcObject[prop];
+    }
+    return dstObject;
+  },
+
+  verifier: function(name, proto) {
+    JsMockito.verifiers[name] = function() {};
+    JsMockito.verifiers[name].prototype = new JsMockito.Verifier;
+    JsMockito.verifiers[name].prototype.constructor = JsMockito.verifiers[name];
+    JsMockito.extend(JsMockito.verifiers[name].prototype, proto);
   }
 };

@@ -13,12 +13,12 @@
  * JsMockito.verify(mockFunc)(1, greaterThan(2));
  * </pre>
  *
- * @param mockName {string} The name of the mock function to use in messages
+ * @param funcName {string} The name of the mock function to use in messages
  *   (defaults to 'func')
  * @return {function} an anonymous function
  */
-JsMockito.mockFunction = function(mockName) {
-  mockName = mockName || 'func';
+JsMockito.mockFunction = function(funcName) {
+  funcName = funcName || 'func';
 
   var stubMatchers = []
   var interactions = [];
@@ -67,7 +67,7 @@ JsMockito.mockFunction = function(mockName) {
 
   mockFunc._jsMockitoVerifier = function(contextMatcher, verifier) {
     return matcherCaptureFunction(contextMatcher, function(matchers) {
-      return verifier(interactions, matchers, mockName, matchers[0] != contextMatcher);
+      return verifier(funcName, interactions, matchers, matchers[0] != contextMatcher);
     });
   };
 
