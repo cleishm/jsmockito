@@ -34,11 +34,12 @@ Screw.Unit(function() {
           assertThat(exception, equalTo("Wanted but not invoked: func()"));
         });
 
-/*
         it("should verify that the mock function was never invoked", function() {
           verify(mockFunc, never())();
+          verify(mockFunc, never()).call(this);
         });
 
+/*
         it("should verify that mock function had zero interactions", function() {
           verifyZeroInteractions(mockFunc);
         });
