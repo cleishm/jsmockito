@@ -140,7 +140,7 @@ JsMockito = {
   },
 
   verifier: function(name, proto) {
-    JsMockito.verifiers[name] = function() {};
+    JsMockito.verifiers[name] = function() { JsMockito.Verifier.apply(this, arguments) };
     JsMockito.verifiers[name].prototype = new JsMockito.Verifier;
     JsMockito.verifiers[name].prototype.constructor = JsMockito.verifiers[name];
     JsMockito.extend(JsMockito.verifiers[name].prototype, proto);

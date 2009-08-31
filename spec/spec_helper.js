@@ -6,6 +6,7 @@ Screw.Matchers.verify = JsMockito.verify;
 Screw.Matchers.verifyZeroInteractions = JsMockito.verifyZeroInteractions;
 Screw.Matchers.never = JsMockito.verifiers.never;
 Screw.Matchers.zeroInteractions = JsMockito.verifiers.zeroInteractions;
+Screw.Matchers.times = JsMockito.verifiers.times;
 Screw.Matchers.once = JsMockito.verifiers.once;
 
 Screw.Matchers.throwsMessage = function(exceptionText) {

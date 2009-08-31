@@ -2,20 +2,26 @@
 
 JsMockito.verifiers = {
   never: function() {
-    return new JsMockito.verifiers.Never();
+    return new JsMockito.verifiers.Times(0);
   },
 
   zeroInteractions: function() {
     return new JsMockito.verifiers.ZeroInteractions();
   },
 
+  times: function(wanted) { 
+    return new JsMockito.verifiers.Times(wanted);
+  },
+
   once: function() { 
-    return new JsMockito.verifiers.Once();
+    return new JsMockito.verifiers.Times(1);
   }
 };
 
-JsMockito.Verifier = function() {};
+JsMockito.Verifier = function() { this.init.apply(this, arguments) };
 JsMockito.Verifier.prototype = {
+  init: function() { },
+
   verify: function(mock) {
     var self = this;
     return mock._jsMockitoVerifier(JsHamcrest.Matchers.anything(), function() {
@@ -45,32 +51,30 @@ JsMockito.Verifier.prototype = {
   }
 };
 
-JsMockito.verifier('Never', {
-  verifyInteractions: function(funcName, interactions, matchers, withContext) {
-    var interaction = JsMockito.find(interactions, function(interaction) {
-      return JsMockito.matchArray(matchers, interaction);
-    });
-    if (interaction === undefined)
-      return;
+JsMockito.verifier('Times', {
+  init: function(wanted) {
+    this.wanted = wanted;
+  },
 
-    var description = this.buildDescription(
-      'Never wanted but invoked', funcName, matchers, withContext);
-    throw description.get();
-  }
-});
-
-JsMockito.verifier('Once', {
   verifyInteractions: function(funcName, interactions, matchers, withContext) {
     var interactions = JsMockito.grep(interactions, function(interaction) {
       return JsMockito.matchArray(matchers, interaction);
     });
-    if (interactions.length == 1)
+    if (interactions.length == this.wanted)
       return;
 
-    var description = this.buildDescription(
-      (interactions.length == 0)?
-        'Wanted but not invoked' : 'Wanted 1 invocation but got ' + interactions.length,
-      funcName, matchers, withContext);
+    var message;
+    if (interactions.length == 0) {
+      message = 'Wanted but not invoked';
+    } else if (this.wanted == 0) {
+      message = 'Never wanted but invoked';
+    } else if (this.wanted == 1) {
+      message = 'Wanted 1 invocation but got ' + interactions.length;
+    } else {
+      message = 'Wanted ' + this.wanted + ' invocations but got ' + interactions.length;
+    }
+
+    var description = this.buildDescription(message, funcName, matchers, withContext);
     throw description.get();
   }
 });
