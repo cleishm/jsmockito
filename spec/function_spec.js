@@ -39,11 +39,9 @@ Screw.Unit(function() {
           verify(mockFunc, never()).call(this);
         });
 
-/*
         it("should verify that mock function had zero interactions", function() {
           verifyZeroInteractions(mockFunc);
         });
-*/
       });
 
       describe("when mock function invoked once with no arguments", function() { 
@@ -157,6 +155,7 @@ Screw.Unit(function() {
           assertThat(exception, not(nil()), "Exception not raised");
           assertThat(exception, equalTo("Wanted but not invoked: func()"));
         });
+*/
 
         it("should verify that the mock function was never invoked with arguments", function() {
           verify(mockFunc, never())('summer', 69);
@@ -172,9 +171,8 @@ Screw.Unit(function() {
             exception = err;
           }
           assertThat(exception, not(nil()), "Exception not raised");
-          assertThat(exception, equalTo("Wanted but not invoked: func()"));
+          assertThat(exception, equalTo("Never wanted but invoked: func()"));
         });
-*/
       });
 
 /*

@@ -71,6 +71,10 @@ JsMockito.mockFunction = function(funcName) {
     });
   };
 
+  mockFunc._jsMockitoMockFunctions = function() {
+    return [ mockFunc ];
+  };
+
   return mockFunc;
 
   function matcherCaptureFunction(contextMatcher, handler) {

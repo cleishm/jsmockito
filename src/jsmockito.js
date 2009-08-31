@@ -20,6 +20,14 @@ JsMockito = {
   version: '@VERSION',
 
   /**
+   * Test if a given variable is a mock
+   * @return {boolean} true if the variable is a mock
+   */
+  isMock: function(maybeMock) {
+    return typeof maybeMock._jsMockitoVerifier != 'undefined';
+  },
+
+  /**
    * Add a stub for a mock object method or anonymous function
    * @param mock A mock object or mock anonymous function
    * @return {object or function} A stub builder on which the method or
@@ -37,6 +45,10 @@ JsMockito = {
    */
   verify: function(mock, verifier) {
     return (verifier || JsMockito.verifiers.once()).verify(mock);
+  },
+
+  verifyZeroInteractions: function(mock) {
+    JsMockito.verifiers.zeroInteractions().verify(mock);
   },
 
   contextCaptureFunction: function(defaultContext, handler) {
@@ -77,14 +89,22 @@ JsMockito = {
   },
 
   each: function(array, callback) {
-    for (var i = 0; i < array.length; i++)
-      callback(array[i], i);
+    if (array.length == undefined) {
+      for (var key in array)
+        callback(array[key], key);
+    } else {
+      for (var i = 0; i < array.length; i++)
+        callback(array[i], i);
+    }
   },
 
   map: function(array, callback) {
     var result = [];
-    for (var i = 0; i < array.length; i++)
-      result.push(callback(array[i], i));
+    JsMockito.each(array, function(elem, key) {
+      var val = callback(elem, key);
+      if (val != null)
+        result.push(val);
+    });
     return result;
   },
 

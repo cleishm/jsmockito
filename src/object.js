@@ -57,7 +57,7 @@ JsMockito.mock = function(Obj) {
       stubBuilderObject[name] = stubBuilders[name].apply(this, delegateArgs);
     }
     return stubBuilderObject;
-  }
+  };
 
   mockObject._jsMockitoVerifier = function() {
     var delegateArgs = [contextMatcher].concat(
@@ -68,7 +68,13 @@ JsMockito.mock = function(Obj) {
       verifierObject[name] = verifiers[name].apply(this, delegateArgs);
     }
     return verifierObject;
-  }
+  };
+
+  mockObject._jsMockitoMockFunctions = function() {
+    return JsMockito.map(mockObject, function(func) {
+      return JsMockito.isMock(func)? func : null;
+    });
+  };
 
   return mockObject;
 };

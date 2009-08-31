@@ -29,6 +29,10 @@ Screw.Unit(function() {
         var verifier = verify(mockObj);
         assertThat(verifier, instanceOf(MyObject));
       });
+
+      it("should verify that mock object had zero interactions", function() {
+        verifyZeroInteractions(mockObj);
+      });
     });
 
     describe("when mock method invoked once with no arguments", function() { 
@@ -80,6 +84,17 @@ Screw.Unit(function() {
         assertThat(exception, equalTo("Wanted but not invoked: obj.greeting()"));
       });
 */
+
+      it("should not verify that the mock object had zero interactions", function() {
+        var exception;
+        try { 
+          verifyZeroInteractions(mockObj);
+        } catch (err) {
+          exception = err;
+        }
+        assertThat(exception, not(nil()), "Exception not raised");
+        assertThat(exception, equalTo("Never wanted but invoked: obj.greeting()"));
+      });
     });
 
     describe("when mock method invocked with multiple arguments", function() {

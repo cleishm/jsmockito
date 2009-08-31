@@ -5,6 +5,10 @@ JsMockito.verifiers = {
     return new JsMockito.verifiers.Never();
   },
 
+  zeroInteractions: function() {
+    return new JsMockito.verifiers.ZeroInteractions();
+  },
+
   once: function() { 
     return new JsMockito.verifiers.Once();
   }
@@ -69,3 +73,11 @@ JsMockito.verifier('Once', {
   }
 });
 
+JsMockito.verifier('ZeroInteractions', {
+  verify: function(mock) {
+    var neverVerifier = JsMockito.verifiers.never();
+    JsMockito.each(mock._jsMockitoMockFunctions(), function(mockFunc) {
+      neverVerifier.verify(mockFunc)();
+    });
+  }
+});
