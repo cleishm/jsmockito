@@ -112,6 +112,15 @@ JsMockito = {
     return result;
   },
 
+  grep: function(array, callback) {
+    var result = [];
+    JsMockito.each(array, function(elem, key) {
+      if (callback(elem, key))
+        result.push(elem);
+    });
+    return result;
+  },
+
   find: function(array, callback) {
     for (var i = 0; i < array.length; i++)
       if (callback(array[i], i))

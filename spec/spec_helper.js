@@ -5,6 +5,8 @@ Screw.Matchers.when = JsMockito.when;
 Screw.Matchers.verify = JsMockito.verify;
 Screw.Matchers.verifyZeroInteractions = JsMockito.verifyZeroInteractions;
 Screw.Matchers.never = JsMockito.verifiers.never;
+Screw.Matchers.zeroInteractions = JsMockito.verifiers.zeroInteractions;
+Screw.Matchers.once = JsMockito.verifiers.once;
 
 Screw.Matchers.throwsMessage = function(exceptionText) {
   return new JsHamcrest.SimpleMatcher({

@@ -61,14 +61,16 @@ JsMockito.verifier('Never', {
 
 JsMockito.verifier('Once', {
   verifyInteractions: function(funcName, interactions, matchers, withContext) {
-    var interaction = JsMockito.find(interactions, function(interaction) {
+    var interactions = JsMockito.grep(interactions, function(interaction) {
       return JsMockito.matchArray(matchers, interaction);
     });
-    if (interaction)
+    if (interactions.length == 1)
       return;
 
     var description = this.buildDescription(
-      'Wanted but not invoked', funcName, matchers, withContext);
+      (interactions.length == 0)?
+        'Wanted but not invoked' : 'Wanted 1 invocation but got ' + interactions.length,
+      funcName, matchers, withContext);
     throw description.get();
   }
 });
