@@ -60,40 +60,26 @@ Screw.Unit(function() {
       });
 
       it("should not verify method was invoked with different context", function() {
-        var exception;
         var testContext = {};
-        try {
+        assertThat(function() {
           verify(mockObj).greeting.call(testContext);
-        } catch (err) {
-          exception = err;
-        }
-        assertThat(exception, not(nil()), "Exception not raised");
-        assertThat(exception, equalTo(
-          "Wanted but not invoked: obj.greeting(), 'this' being equal to " + testContext));
+        }, throwsMessage(
+          "Wanted but not invoked: obj.greeting(), 'this' being equal to " + testContext)
+        );
       });
 
 /*
       it("should verify that method was not invoked twice", function() {
-        var exception;
-        try { 
+        assertThat(function() {
           verify(mockObj, times(2)).greeting();
-        } catch (err) {
-          exception = err;
-        }
-        assertThat(exception, not(nil()), "Exception not raised");
-        assertThat(exception, equalTo("Wanted but not invoked: obj.greeting()"));
+        }, throwsMessage("Wanted but not invoked: obj.greeting()"));
       });
 */
 
       it("should not verify that the mock object had zero interactions", function() {
-        var exception;
-        try { 
+        assertThat(function() {
           verifyZeroInteractions(mockObj);
-        } catch (err) {
-          exception = err;
-        }
-        assertThat(exception, not(nil()), "Exception not raised");
-        assertThat(exception, equalTo("Never wanted but invoked: obj.greeting()"));
+        }, throwsMessage("Never wanted but invoked: obj.greeting()"));
       });
     });
 
@@ -121,27 +107,19 @@ Screw.Unit(function() {
       });
 
       it("should not verify the method was invoked if looking for additional arguments", function() {
-        var exception;
-        try { 
+        assertThat(function() {
           verify(mockObj).farewell('hunter', 'thompson', 67, 'batcountry');
-        } catch (err) {
-          exception = err;
-        }
-        assertThat(exception, not(nil()), "Exception not raised");
-        assertThat(exception, equalTo(
-          "Wanted but not invoked: obj.farewell(<equal to \"hunter\">, <equal to \"thompson\">, <equal to 67>, <equal to \"batcountry\">)"));
+        }, throwsMessage(
+          "Wanted but not invoked: obj.farewell(<equal to \"hunter\">, <equal to \"thompson\">, <equal to 67>, <equal to \"batcountry\">)")
+        );
       });
 
       it("should not verify the method was invoked if different arguments", function() {
-        var exception;
-        try { 
+        assertThat(function() {
           verify(mockObj).farewell('hunter', 'thompson', 68);
-        } catch (err) {
-          exception = err;
-        }
-        assertThat(exception, not(nil()), "Exception not raised");
-        assertThat(exception, equalTo(
-          "Wanted but not invoked: obj.farewell(<equal to \"hunter\">, <equal to \"thompson\">, <equal to 68>)"));
+        }, throwsMessage(
+          "Wanted but not invoked: obj.farewell(<equal to \"hunter\">, <equal to \"thompson\">, <equal to 68>)")
+        );
       });
     });
 
@@ -154,14 +132,9 @@ Screw.Unit(function() {
       });
 
       it("should not verify that the method was invoked without explicit context", function() {
-        var exception;
-        try {
+        assertThat(function() {
           verify(mockObj).greeting();
-        } catch (err) {
-          exception = err;
-        }
-        assertThat(exception, not(nil()), "Exception not raised");
-        assertThat(exception, equalTo("Wanted but not invoked: obj.greeting()"));
+        }, throwsMessage("Wanted but not invoked: obj.greeting()"));
       });
 
       it("should verify method was invoked with explicit context", function() {

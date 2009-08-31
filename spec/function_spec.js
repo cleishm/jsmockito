@@ -24,14 +24,7 @@ Screw.Unit(function() {
     describe("#verify", function() {
       describe("when never invoked", function() {
         it("should not verify that the mock function was invoked", function() {
-          var exception;
-          try { 
-            verify(mockFunc)();
-          } catch (err) {
-            exception = err;
-          }
-          assertThat(exception, not(nil()), "Exception not raised");
-          assertThat(exception, equalTo("Wanted but not invoked: func()"));
+          assertThat(function() { verify(mockFunc)() }, throwsMessage("Wanted but not invoked: func()"));
         });
 
         it("should verify that the mock function was never invoked", function() {
@@ -71,89 +64,48 @@ Screw.Unit(function() {
         });
 
         it("should not verify function was invoked with different context using call", function() {
-          var exception;
           var testContext = {};
-          try {
+          assertThat(function() {
             verify(mockFunc).call(testContext);
-          } catch (err) {
-            exception = err;
-          }
-          assertThat(exception, not(nil()), "Exception not raised");
-          assertThat(exception, equalTo(
-            "Wanted but not invoked: func(), 'this' being equal to " + testContext));
+          }, throwsMessage("Wanted but not invoked: func(), 'this' being equal to " + testContext));
         });
 
         it("should not verify function was invoked with different context using apply", function() {
-          var exception;
           var testContext = {};
-          try {
+          assertThat(function() {
             verify(mockFunc).apply(testContext);
-          } catch (err) {
-            exception = err;
-          }
-          assertThat(exception, not(nil()), "Exception not raised");
-          assertThat(exception, equalTo(
-            "Wanted but not invoked: func(), 'this' being equal to " + testContext));
+          }, throwsMessage("Wanted but not invoked: func(), 'this' being equal to " + testContext));
         });
 
         it("should not verify function was invoked with arguments", function() {
-          var exception;
-          try { 
+          assertThat(function() {
             verify(mockFunc)('bar');
-          } catch (err) {
-            exception = err;
-          }
-          assertThat(exception, not(nil()), "Exception not raised");
-          assertThat(exception, equalTo(
-            "Wanted but not invoked: func(<equal to \"bar\">)"));
+          }, throwsMessage("Wanted but not invoked: func(<equal to \"bar\">)"));
         });
 
         it("should not verify function was invoked with arguments using a matcher", function() {
-          var exception;
-          try { 
+          assertThat(function() {
             verify(mockFunc)(lessThan(10));
-          } catch (err) {
-            exception = err;
-          }
-          assertThat(exception, not(nil()), "Exception not raised");
-          assertThat(exception, equalTo(
-            "Wanted but not invoked: func(<less than 10>)"));
+          }, throwsMessage("Wanted but not invoked: func(<less than 10>)"));
         });
 
         it("should not verify function was invoked when additional arguments are undefined", function() {
-          var exception;
-          try { 
+          assertThat(function() {
             verify(mockFunc)(undefined);
-          } catch (err) {
-            exception = err;
-          }
-          assertThat(exception, not(nil()), "Exception not raised");
-          assertThat(exception, equalTo(
-            "Wanted but not invoked: func(<equal to undefined>)"));
+          }, throwsMessage("Wanted but not invoked: func(<equal to undefined>)"));
         });
 
         it("should not verify function was invoked when additional arguments are anything", function() {
-          var exception;
-          try { 
+          assertThat(function() {
             verify(mockFunc)(anything());
-          } catch (err) {
-            exception = err;
-          }
-          assertThat(exception, not(nil()), "Exception not raised");
-          assertThat(exception, equalTo(
-            "Wanted but not invoked: func(<anything>)"));
+          }, throwsMessage("Wanted but not invoked: func(<anything>)"));
         });
 
 /*
         it("should not verify that the mock function was invoked more than once", function() {
-          var exception;
-          try { 
+          assertThat(function() {
             verify(mockFunc, times(2))();
-          } catch (err) {
-            exception = err;
-          }
-          assertThat(exception, not(nil()), "Exception not raised");
-          assertThat(exception, equalTo("Wanted but not invoked: func()"));
+          }, throwsMessage("Wanted but not invoked: func()"));
         });
 */
 
@@ -164,14 +116,9 @@ Screw.Unit(function() {
         });
 
         it("should not verify that the mock function had zero interactions", function() {
-          var exception;
-          try { 
+          assertThat(function() {
             verifyZeroInteractions(mockFunc);
-          } catch (err) {
-            exception = err;
-          }
-          assertThat(exception, not(nil()), "Exception not raised");
-          assertThat(exception, equalTo("Never wanted but invoked: func()"));
+          }, throwsMessage("Never wanted but invoked: func()"));
         });
       });
 
@@ -185,14 +132,9 @@ Screw.Unit(function() {
         });
 
         it("should not verify that the mock function was invoked more once", function() {
-          var exception;
-          try { 
+          assertThat(function() {
             verify(mockFunc)();
-          } catch (err) {
-            exception = err;
-          }
-          assertThat(exception, not(nil()), "Exception not raised");
-          assertThat(exception, equalTo("func() - invoked 2 times wanted 1 time"));
+          }, throwsMessage("func() - invoked 2 times wanted 1 time"));
         });
 
         it("should verify that mock function was invoked twice", function() {
@@ -200,14 +142,9 @@ Screw.Unit(function() {
         });
 
         it("should not verify that the mock function was invoked more than twice", function() {
-          var exception;
-          try { 
+          assertThat(function() {
             verify(mockFunc, times(3))();
-          } catch (err) {
-            exception = err;
-          }
-          assertThat(exception, not(nil()), "Exception not raised");
-          assertThat(exception, equalTo("func() - invoked 2 times wanted 3 times"));
+          }, throwsMessage("func() - invoked 2 times wanted 3 times"));
         });
       });
 */
@@ -230,15 +167,9 @@ Screw.Unit(function() {
         });
 
         it("should not verify function was invoked with different arg", function() {
-          var exception;
-          try { 
+          assertThat(function() {
             verify(mockFunc).call(context, 'bar');
-          } catch (err) {
-            exception = err;
-          }
-          assertThat(exception, not(nil()), "Exception not raised");
-          assertThat(exception, equalTo(
-            "Wanted but not invoked: func(<equal to \"bar\">), 'this' being equal to " + context));
+          }, throwsMessage("Wanted but not invoked: func(<equal to \"bar\">), 'this' being equal to " + context));
         });
       });
 
@@ -269,27 +200,19 @@ Screw.Unit(function() {
         });
 
         it("should not verify function was invoked using more matchers than args", function() {
-          var exception;
-          try { 
+          assertThat(function() {
             verify(mockFunc)(args[0], 'boo', {}, anything());
-          } catch (err) {
-            exception = err;
-          }
-          assertThat(exception, not(nil()), "Exception not raised");
-          assertThat(exception, equalTo(
-            "Wanted but not invoked: func(<equal to 1>, <equal to \"boo\">, <equal to " + args[2] + ">, <anything>)"));
+          }, throwsMessage(
+            "Wanted but not invoked: func(<equal to 1>, <equal to \"boo\">, <equal to " + args[2] + ">, <anything>)")
+          );
         });
 
         it("should not verify function was invoked with args not matching matchers", function() {
-          var exception;
-          try { 
+          assertThat(function() {
             verify(mockFunc)(args[0], 'boo', {});
-          } catch (err) {
-            exception = err;
-          }
-          assertThat(exception, not(nil()), "Exception not raised");
-          assertThat(exception, equalTo(
-            "Wanted but not invoked: func(<equal to 1>, <equal to \"boo\">, <equal to " + args[2] + ">)"));
+          }, throwsMessage(
+            "Wanted but not invoked: func(<equal to 1>, <equal to \"boo\">, <equal to " + args[2] + ">)")
+          );
         });
       });
     });
@@ -543,13 +466,7 @@ Screw.Unit(function() {
       });
 
       it("should use defined name in verification failures", function() {
-        var exception;
-        try { 
-          verify(mockFunc)();
-        } catch (err) {
-          exception = err;
-        }
-        assertThat(exception, equalTo("Wanted but not invoked: myfunctor()"));
+        assertThat(function() { verify(mockFunc)() }, throwsMessage("Wanted but not invoked: myfunctor()"));
       });
     });
   });

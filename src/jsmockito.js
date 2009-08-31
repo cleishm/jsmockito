@@ -28,7 +28,7 @@ JsMockito = {
   },
 
   /**
-   * Add a stub for a mock object method or anonymous function
+   * Add a stub for a mock object method or mock function
    * @param mock A mock object or mock anonymous function
    * @return {object or function} A stub builder on which the method or
    * function to be stubbed can be invoked
@@ -38,7 +38,7 @@ JsMockito = {
   },
 
   /**
-   * Verify that a mock object method or anonymous function was invoked
+   * Verify that a mock object method or mock function was invoked
    * @param mock A mock object or mock anonymous function
    * @return {object or function} A verifier on which the method or function to
    *   be verified can be invoked
@@ -47,6 +47,10 @@ JsMockito = {
     return (verifier || JsMockito.verifiers.once()).verify(mock);
   },
 
+  /**
+   * Verify that no mock object methods or the mock function was never invoked
+   * @param mock A mock object or mock anonymous function
+   */
   verifyZeroInteractions: function(mock) {
     JsMockito.verifiers.zeroInteractions().verify(mock);
   },
