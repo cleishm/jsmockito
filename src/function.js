@@ -15,10 +15,17 @@
  *
  * @param funcName {string} The name of the mock function to use in messages
  *   (defaults to 'func')
+ * @param delegate {function} The function to delegate unstubbed calls to
+ *   (optional)
  * @return {function} an anonymous function
  */
-JsMockito.mockFunction = function(funcName) {
+JsMockito.mockFunction = function(funcName, delegate) {
+  if (typeof funcName == 'function') {
+    delegate = funcName;
+    funcName = undefined;
+  }
   funcName = funcName || 'func';
+  delegate = delegate || function() { };
 
   var stubMatchers = []
   var interactions = [];
@@ -32,7 +39,7 @@ JsMockito.mockFunction = function(funcName) {
       return JsMockito.matchArray(stubMatcher[0], args);
     });
     if (stubMatcher == undefined)
-      return undefined;
+      return delegate.apply(this, arguments);
     var stubs = stubMatcher[1];
     if (stubs.length == 0)
       return undefined;
