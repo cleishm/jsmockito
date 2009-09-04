@@ -30,6 +30,13 @@
  * @return {object} a mock object
  */
 JsMockito.mock = function(Obj) {
+  var delegate = {};
+  if (typeof Obj != "function") {
+    delegate = Obj;
+    Obj = function() { };
+    Obj.prototype = delegate; 
+    Obj.prototype.constructor = Obj;
+  }
   var MockObject = function() { };
   MockObject.prototype = new Obj;
   MockObject.prototype.constructor = MockObject;
@@ -43,7 +50,14 @@ JsMockito.mock = function(Obj) {
   for (var name in mockObject) (function(name) {
     if (name == 'constructor')
       return;
-    mockObject[name] = JsMockito.mockFunction('obj.' + name);
+    var delegateMethod;
+    if (delegate[name] != undefined) {
+      delegateMethod = function() {
+        var scope = (this == mockObject)? delegate : this;
+        return delegate[name].apply(scope, arguments);
+      };
+    }
+    mockObject[name] = JsMockito.mockFunction('obj.' + name, delegateMethod);
     stubBuilders[name] = mockObject[name]._jsMockitoStubBuilder;
     verifiers[name] = mockObject[name]._jsMockitoVerifier;
   })(name);
