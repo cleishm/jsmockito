@@ -47,9 +47,7 @@ JsMockito.mock = function(Obj) {
   
   var contextMatcher = JsHamcrest.Matchers.equalTo(mockObject);
 
-  for (var name in mockObject) (function(name) {
-    if (name == 'constructor')
-      return;
+  var addMockMethod = function(name) {
     var delegateMethod;
     if (delegate[name] != undefined) {
       delegateMethod = function() {
@@ -60,7 +58,20 @@ JsMockito.mock = function(Obj) {
     mockObject[name] = JsMockito.mockFunction('obj.' + name, delegateMethod);
     stubBuilders[name] = mockObject[name]._jsMockitoStubBuilder;
     verifiers[name] = mockObject[name]._jsMockitoVerifier;
-  })(name);
+  };
+
+  for (var methodName in mockObject) {
+    if (methodName != 'constructor')
+      addMockMethod(methodName);
+  }
+
+  for (var typeName in JsMockito.nativeTypes) {
+    if (mockObject instanceof JsMockito.nativeTypes[typeName].type) {
+      for (var i = 0; i < JsMockito.nativeTypes[typeName].methods.length; ++i) {
+        addMockMethod(JsMockito.nativeTypes[typeName].methods[i]);
+      }
+    }
+  }
 
   mockObject._jsMockitoStubBuilder = function() {
     var delegateArgs = [contextMatcher].concat(

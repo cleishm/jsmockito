@@ -26,7 +26,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 load('../lib/env.rhino.js');
-window.location = 'suite.html';
+window.location = 'suite-dist.html';
 
 var scripts = document.getElementsByTagName('script');
 for (var i=0; i < scripts.length; i++) {
