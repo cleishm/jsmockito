@@ -5,7 +5,7 @@ Screw.Unit(function() {
     var proxyMock;
     before(function() {
       mockFunc = mockFunction();
-      proxyMock = mockFunction(mockFunc);
+      proxyMock = spy(mockFunc);
     });
 
     describe("when invoked", function() {

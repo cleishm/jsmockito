@@ -71,6 +71,7 @@ for (var i=0; i < scripts.length; i++) {
     print(elapsedTime.toString() + " seconds elapsed");
     
     if (failed > 0) { java.lang.System.exit(1) };
+    java.lang.System.exit((failed > 0)? 1 : 0);
   });
 })(jQuery);
 

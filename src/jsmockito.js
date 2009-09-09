@@ -55,6 +55,20 @@ JsMockito = {
     JsMockito.verifiers.zeroInteractions().verify(mock);
   },
 
+  /**
+   * Create a mock that proxies a real function or object.  All un-stubbed
+   * invocations will be passed through to the real implementation, but can
+   * still be verified.
+   * @param {object or function} A 'real' (concrete) object or function that
+   * the mock will proxy
+   * @return {object or function} A mock object (as per mock) or mock function
+   * (as per mockFunction)
+   */
+  spy: function(delegate) {
+    return (typeof delegate == 'function')?
+      JsMockito.mockFunction(delegate) : JsMockito.mock(delegate);
+  },
+
   contextCaptureFunction: function(defaultContext, handler) {
     // generate a function with overridden 'call' and 'apply' methods
     // and apply a default context when these are not used to supply
