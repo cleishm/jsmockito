@@ -37,27 +37,27 @@ and plug JsMockito into it.  If you're integrating with Screw.Unit
 
 Once installed, you can verify with interactions:
 
-   var mockedObject = mock(Array);
- 
-   // -- start code under test --
-   mockedObject.push("one");
-   // -- end code under test --
- 
-   verify(mockedObject).push("one");
+    var mockedObject = mock(Array);
+     
+    // -- start code under test --
+    mockedObject.push("one");
+    // -- end code under test --
+     
+    verify(mockedObject).push("one");
 
 
 Or you can stub method calls:
 
-   var mockObject = mock(MyClass);
- 
-   when(mockObject).get(1).thenReturn("hello world");
-   
-   // -- start code under test --
-   alert(mockedObject.getGreeting("initial"));
- 
-   // the following alerts 'true' as get(99) was not stubbed
-   alert(typeof (mockedObject.get(99)) === 'undefined');
-   // -- end code under test --
+    var mockObject = mock(MyClass);
+     
+    when(mockObject).get(1).thenReturn("hello world");
+     
+    // -- start code under test --
+    alert(mockedObject.getGreeting("initial"));
+     
+    // the following alerts 'true' as get(99) was not stubbed
+    alert(typeof (mockedObject.get(99)) === 'undefined');
+    // -- end code under test --
 
 
 For a JavaScript twist, you can also mock functions:
@@ -66,11 +66,11 @@ For a JavaScript twist, you can also mock functions:
     when(mockFunc).call(this, anything()).then(function(arg) {
       return "foo " + arg;
     });
-  
+     
     // -- start code under test --
     mockFunc("bar");
     // -- end code under test --
-  
+     
     verify(mockFunc).call(this, anything());
  
 
