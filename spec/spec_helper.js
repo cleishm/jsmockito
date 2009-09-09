@@ -1,14 +1,5 @@
 JsHamcrest.Integration.screwunit();
-Screw.Matchers.mock = JsMockito.mock;
-Screw.Matchers.mockFunction = JsMockito.mockFunction;
-Screw.Matchers.spy = JsMockito.spy;
-Screw.Matchers.when = JsMockito.when;
-Screw.Matchers.verify = JsMockito.verify;
-Screw.Matchers.verifyZeroInteractions = JsMockito.verifyZeroInteractions;
-Screw.Matchers.never = JsMockito.verifiers.never;
-Screw.Matchers.zeroInteractions = JsMockito.verifiers.zeroInteractions;
-Screw.Matchers.times = JsMockito.verifiers.times;
-Screw.Matchers.once = JsMockito.verifiers.once;
+JsMockito.Integration.screwunit();
 
 Screw.Matchers.throwsMessage = function(exceptionText) {
   return new JsHamcrest.SimpleMatcher({
