@@ -1,20 +1,49 @@
 // vi:ts=2 sw=2 expandtab
 
-JsMockito.verifiers = {
+/**
+ * Verifiers
+ * @namespace
+ */
+JsMockito.Verifiers = {
+  _export: ['never', 'zeroInteractions', 'times', 'once'],
+
+  /**
+   * Test that a invocation never occurred, eg:
+   * verify(mock, never()).method();
+   *
+   * Alias for JsMockito.Verifiers.times(0)
+   */
   never: function() {
-    return new JsMockito.verifiers.Times(0);
+    return new JsMockito.Verifiers.Times(0);
   },
 
+  /** Test that no interaction were made on the mock, eg:
+   * verify(mock, zeroInteractions());
+   *
+   * (see JsMockito.verifyZeroInteractions())
+   */
   zeroInteractions: function() {
-    return new JsMockito.verifiers.ZeroInteractions();
+    return new JsMockito.Verifiers.ZeroInteractions();
   },
 
+  /**
+   * Test that an invocation occurred a specific number of times, eg:
+   * verify(mock, times(2)).method();
+   *
+   * @param wanted The number of desired invocations
+   */
   times: function(wanted) { 
-    return new JsMockito.verifiers.Times(wanted);
+    return new JsMockito.Verifiers.Times(wanted);
   },
 
+  /**
+   * Test that an invocation occurred exactly once, eg:
+   * verify(mock, once()).method();
+   *
+   * This is the default verifier and an alias for JsMockito.Verifiers.times(0)
+   */
   once: function() { 
-    return new JsMockito.verifiers.Times(1);
+    return new JsMockito.Verifiers.Times(1);
   }
 };
 
@@ -81,7 +110,7 @@ JsMockito.verifier('Times', {
 
 JsMockito.verifier('ZeroInteractions', {
   verify: function(mock) {
-    var neverVerifier = JsMockito.verifiers.never();
+    var neverVerifier = JsMockito.Verifiers.never();
     JsMockito.each(mock._jsMockitoMockFunctions(), function(mockFunc) {
       neverVerifier.verify(mockFunc)();
     });

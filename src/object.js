@@ -103,3 +103,4 @@ JsMockito.mock = function(Obj) {
 
   return mockObject;
 };
+JsMockito._export.push('mock');

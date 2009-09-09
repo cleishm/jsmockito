@@ -93,3 +93,4 @@ JsMockito.mockFunction = function(funcName, delegate) {
     );
   };
 };
+JsMockito._export.push('mockFunction');

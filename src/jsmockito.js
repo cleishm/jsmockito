@@ -19,6 +19,8 @@ JsMockito = {
    */
   version: '@VERSION',
 
+  _export: ['isMock', 'when', 'verify', 'verifyZeroInteractions', 'spy'],
+
   /**
    * Test if a given variable is a mock
    * @return {boolean} true if the variable is a mock
@@ -44,7 +46,7 @@ JsMockito = {
    *   be verified can be invoked
    */
   verify: function(mock, verifier) {
-    return (verifier || JsMockito.verifiers.once()).verify(mock);
+    return (verifier || JsMockito.Verifiers.once()).verify(mock);
   },
 
   /**
@@ -52,7 +54,7 @@ JsMockito = {
    * @param mock A mock object or mock anonymous function
    */
   verifyZeroInteractions: function(mock) {
-    JsMockito.verifiers.zeroInteractions().verify(mock);
+    JsMockito.Verifiers.zeroInteractions().verify(mock);
   },
 
   /**
@@ -154,9 +156,9 @@ JsMockito = {
   },
 
   verifier: function(name, proto) {
-    JsMockito.verifiers[name] = function() { JsMockito.Verifier.apply(this, arguments) };
-    JsMockito.verifiers[name].prototype = new JsMockito.Verifier;
-    JsMockito.verifiers[name].prototype.constructor = JsMockito.verifiers[name];
-    JsMockito.extend(JsMockito.verifiers[name].prototype, proto);
+    JsMockito.Verifiers[name] = function() { JsMockito.Verifier.apply(this, arguments) };
+    JsMockito.Verifiers[name].prototype = new JsMockito.Verifier;
+    JsMockito.Verifiers[name].prototype.constructor = JsMockito.Verifiers[name];
+    JsMockito.extend(JsMockito.Verifiers[name].prototype, proto);
   }
 };

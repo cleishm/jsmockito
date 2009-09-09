@@ -2,17 +2,14 @@
 
 JsMockito.Integration = {
   importTo: function(target) {
-    var importMethods = [
-      'mock', 'mockFunction', 'spy', 'when', 'verify', 'verifyZeroInteractions'
-    ];
-
-    for (var i = importMethods.length; i > 0; --i) {
-      var methodName = importMethods[i-1];
-      target[methodName] = JsMockito[methodName];
+    for (var i = JsMockito._export.length; i > 0; --i) {
+      var exported = JsMockito._export[i-1];
+      target[exported] = JsMockito[exported];
     }
 
-    for (var methodName in JsMockito.verifiers) {
-      target[methodName] = JsMockito.verifiers[methodName];
+    for (var i = JsMockito.Verifiers._export.length; i > 0; --i) {
+      var exported = JsMockito.Verifiers._export[i-1];
+      target[exported] = JsMockito.Verifiers[exported];
     }
   },
 
