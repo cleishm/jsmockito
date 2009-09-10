@@ -118,6 +118,6 @@ Who is your bartender?
 ----------------------
 
 This variation is served to you by Chris Leishman and friends.  Also a big
-thumbs up and thanks to the mockito guys for the inspiration!
+thank you to the mockito guys for the inspiration!
 
 Also thanks to the JsHamcrest authors, who made this easy.
