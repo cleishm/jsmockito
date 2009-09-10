@@ -52,6 +52,7 @@
         <replaceregexp match="@VERSION" replace="${VERSION}" flags="g" byline="true" file="${DIST}"/>
         <replaceregexp match="@DATE" replace="${DATE}" file="${DIST}"/>
         <replaceregexp match="@REV" replace="${REV}" file="${DIST}"/>
+        <replaceregexp match="^// vi:.*$" replace="" flags="g" byline="true" file="${DIST}"/>
         <copy file="${DIST}" tofile="${DIST_V}"/>
         <echo message="Basic version created at ${DIST}"/>
     </target>
