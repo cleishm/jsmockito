@@ -64,7 +64,7 @@ JsMockito.Verifier.prototype = {
   buildDescription: function(message, funcName, matchers, withContext) {
     var description = new JsHamcrest.Description();
     description.append(message + ': ' + funcName + '(');
-    JsMockito.each(matchers.splice(1), function(matcher, i) {
+    JsMockito.each(matchers.slice(1), function(matcher, i) {
       if (i > 0)
         description.append(', ');
       description.append('<');
