@@ -47,12 +47,12 @@ Once installed, you can verify with interactions:
 
 Or you can stub method calls:
 
-    var mockedObject = mock(MyClass);
+    var mockedObject = mock(Array);
   
     when(mockedObject).get(1).thenReturn("hello world");
     
     // -- start code under test --
-    alert(mockedObject.getGreeting("initial"));
+    alert(mockedObject.get(1));
   
     // the following alerts 'true' as get(99) was not stubbed
     alert(typeof (mockedObject.get(99)) === 'undefined');
