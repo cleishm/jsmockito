@@ -105,12 +105,12 @@ into it. If you're integrating with <a href="http://github.com/nkallen/screw-uni
 <h3>Or you can stub method calls:</h3>
 
 <pre>
-    var mockedObject = mock(MyClass);
+    var mockedObject = mock(Array);
   
     when(mockedObject).get(1).thenReturn("hello world");
     
     // -- start code under test --
-    alert(mockedObject.getGreeting("initial"));
+    alert(mockedObject.get(1));
   
     // the following alerts 'true' as get(99) was not stubbed
     alert(typeof (mockedObject.get(99)) === 'undefined');
