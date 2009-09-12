@@ -18,7 +18,7 @@ JavaScript twist. And why not add some variation to your drinking habits?
 What do you serve it with?
 --------------------------
 
-JsMockito must be served with JsHamcrest.  No only do they go well
+JsMockito must be served with JsHamcrest.  Not only do they go well
 together, it's essential to avoid a very nasty hangover.  Get
 JsHamcrest from here:
 
