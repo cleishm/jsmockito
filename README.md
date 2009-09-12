@@ -31,8 +31,9 @@ How to drink it?
 To use JsMockito with a JavaScript unit test framework, follow the usual
 installation/configuration instructions for the framework and plug JsMockito
 into it. If you're integrating with Screw.Unit (and why wouldn't you?) then you
-just need to make the following call:
+just need to make the following calls:
 
+    JsHamcrest.Integration.screwunit();
     JsMockito.Integration.screwunit();
 
 Once installed, you can verify with interactions:
