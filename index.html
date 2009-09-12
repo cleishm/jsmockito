@@ -85,9 +85,10 @@ hangover.</p>
 <p>To use JsMockito with a JavaScript unit test framework, follow the usual
 installation/configuration instructions for the framework and plug JsMockito
 into it. If you're integrating with <a href="http://github.com/nkallen/screw-unit/tree/master" target="_top">Screw.Unit</a>
-(and why wouldn't you?) then you just need to make the following call:</p>
+(and why wouldn't you?) then you just need to make the following calls:</p>
 
 <pre>
+    JsHamcrest.Integration.screwunit();
     JsMockito.Integration.screwunit();
 </pre>
 
