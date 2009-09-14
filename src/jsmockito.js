@@ -61,8 +61,8 @@ JsMockito = {
    * Create a mock that proxies a real function or object.  All un-stubbed
    * invocations will be passed through to the real implementation, but can
    * still be verified.
-   * @param {object or function} A 'real' (concrete) object or function that
-   * the mock will proxy
+   * @param {object or function} delegate A 'real' (concrete) object or
+   * function that the mock will delegate unstubbed invocations to
    * @return {object or function} A mock object (as per mock) or mock function
    * (as per mockFunction)
    */

@@ -1,6 +1,15 @@
 // vi:ts=2 sw=2 expandtab
 
+/**
+ * Verifiers
+ * @namespace
+ */
 JsMockito.Integration = {
+  /**
+   * Import the public JsMockito API into the specified object (namespace)
+   * @param {object} target An object (namespace) that will be populated with
+   * the functions from the public JsMockito API
+   */
   importTo: function(target) {
     for (var i = JsMockito._export.length; i > 0; --i) {
       var exported = JsMockito._export[i-1];
@@ -13,6 +22,11 @@ JsMockito.Integration = {
     }
   },
 
+  /**
+   * Make the public JsMockito API available in Screw.Unit
+   *
+   * Alias for JsMockito.Integration.importTo(Screw.Matchers)
+   */
   screwunit: function() {
     JsMockito.Integration.importTo(Screw.Matchers);
   }

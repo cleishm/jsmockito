@@ -16,14 +16,14 @@
  * };
  *
  * var mockObj = JsMockito.mock(MyObject);
- * mockFunc(5, 4); // result is undefined
+ * mockObj.add(5, 4); // result is undefined
  *
  * JsMockito.when(mockFunc).add(1, 2).thenReturn(6);
- * mockFunc(1, 2); // result is 6
+ * mockObj.add(1, 2); // result is 6
  *
- * JsMockito.verify(mockFunc)(1, greaterThan(2)); // ok
- * JsMockito.verify(mockFunc)(1, equalTo(2)); // ok
- * JsMockito.verify(mockFunc)(1, 4); // will throw an exception
+ * JsMockito.verify(mockObj).add(1, greaterThan(2)); // ok
+ * JsMockito.verify(mockObj).add(1, equalTo(2)); // ok
+ * JsMockito.verify(mockObj).add(1, 4); // will throw an exception
  * </pre>
  *
  * @param Obj {function} the constructor for the object to be mocked
