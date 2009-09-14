@@ -3,8 +3,8 @@
 /**
  * Create a mockable and stubbable anonymous function.
  *
- * Once created, the function can be invoked and will return undefined
- * for any interactions that do not match stub declarations.
+ * <p>Once created, the function can be invoked and will return undefined for
+ * any interactions that do not match stub declarations.</p>
  *
  * <pre>
  * var mockFunc = JsMockito.mockFunction();

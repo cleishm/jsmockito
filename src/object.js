@@ -3,12 +3,12 @@
 /**
  * Create a mockable and stubbable objects.
  *
- * A mock is created with the constructor for an object as an argument.  Once
- * created, the mock object will have all the same methods as the source object
- * which, when invoked, will return undefined by default.
+ * <p>A mock is created with the constructor for an object as an argument.
+ * Once created, the mock object will have all the same methods as the source
+ * object which, when invoked, will return undefined by default.</p>
  *
- * Stub declarations may then be made for these methods to have them return
- * useful values or perform actions when invoked.
+ * <p>Stub declarations may then be made for these methods to have them return
+ * useful values or perform actions when invoked.</p>
  *
  * <pre>
  * MyObject = function() {

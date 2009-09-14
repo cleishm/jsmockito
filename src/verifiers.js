@@ -8,27 +8,31 @@ JsMockito.Verifiers = {
   _export: ['never', 'zeroInteractions', 'times', 'once'],
 
   /**
-   * Test that a invocation never occurred, eg:
+   * Test that a invocation never occurred. For example:
+   * <pre>
    * verify(mock, never()).method();
-   *
-   * Alias for JsMockito.Verifiers.times(0)
+   * </pre>
+   * @see JsMockito.Verifiers.times(0)
    */
   never: function() {
     return new JsMockito.Verifiers.Times(0);
   },
 
-  /** Test that no interaction were made on the mock, eg:
+  /** Test that no interaction were made on the mock.  For example:
+   * <pre>
    * verify(mock, zeroInteractions());
-   *
-   * (see JsMockito.verifyZeroInteractions())
+   * </pre>
+   * @see JsMockito.verifyZeroInteractions()
    */
   zeroInteractions: function() {
     return new JsMockito.Verifiers.ZeroInteractions();
   },
 
   /**
-   * Test that an invocation occurred a specific number of times, eg:
+   * Test that an invocation occurred a specific number of times. For example:
+   * <pre>
    * verify(mock, times(2)).method();
+   * </pre>
    *
    * @param wanted The number of desired invocations
    */
@@ -37,10 +41,12 @@ JsMockito.Verifiers = {
   },
 
   /**
-   * Test that an invocation occurred exactly once, eg:
+   * Test that an invocation occurred exactly once. For example:
+   * <pre>
    * verify(mock, once()).method();
-   *
-   * This is the default verifier and an alias for JsMockito.Verifiers.times(0)
+   * </pre>
+   * This is the default verifier.
+   * @see JsMockito.Verifiers.times(1)
    */
   once: function() { 
     return new JsMockito.Verifiers.Times(1);

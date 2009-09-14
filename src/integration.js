@@ -7,6 +7,7 @@
 JsMockito.Integration = {
   /**
    * Import the public JsMockito API into the specified object (namespace)
+   *
    * @param {object} target An object (namespace) that will be populated with
    * the functions from the public JsMockito API
    */
@@ -24,8 +25,7 @@ JsMockito.Integration = {
 
   /**
    * Make the public JsMockito API available in Screw.Unit
-   *
-   * Alias for JsMockito.Integration.importTo(Screw.Matchers)
+   * @see JsMockito.Integration.importTo(Screw.Matchers)
    */
   screwunit: function() {
     JsMockito.Integration.importTo(Screw.Matchers);

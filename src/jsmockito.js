@@ -12,6 +12,127 @@
 /**
  * Main namespace.
  * @namespace
+ *
+ * <h2>Contents</h2>
+ *
+ * <ol>
+ *  <li><a href="#1">Let's verify some behaviour!</a></li>
+ *  <li><a href="#2">How about some stubbing?</a></li>
+ *  <li><a href="#3">Matching Arguments</a></li>
+ *  <li><a href="#4">Matching the context ('this')</a></li>
+ *  <li><a href="#5">Verifying exact number of invocations / at least once /
+ *  never</a></li>
+ *  <li><a href="#6">Making sure invocations never happened on a mock</a></li>
+ * </ol>
+ *
+ * <p>In the following examples object mocking is done with Array and String as
+ * these are well understood, although you probably wouldn't mock these in
+ * normal test development.</p>
+ *
+ * <h2><a name="1">1. Let's verify some behaviour!</a></h2>
+ *
+ * <p>For an object:</p>
+ * <pre>
+ * //mock creation
+ * var mockedArray = mock(Array);
+ *
+ * //using mock object
+ * mockedArray.push("one");
+ * mockedArray.reverse();
+ *
+ * //verification
+ * verify(mockedArray).push("one");
+ * verify(mockedArray).reverse();
+ * </pre>
+ *
+ * <p>For a function:</p>
+ * <pre>
+ * //mock creation
+ * var mockedFunc = mockFunction();
+ *
+ * //using mock function
+ * mockedFunc('hello world');
+ * mockedFunc.call(this, 'foobar');
+ * mockedFunc.apply(this, [ 'barfoo' ]);
+ *
+ * //verification
+ * verify(mockedFunc)('hello world');
+ * verify(mockedFunc)('foobar');
+ * verify(mockedFunc)('barfoo');
+ * </pre>
+ *
+ * <p>Once created a mock will remember all interactions.  Then you selectively
+ * verify whatever interactions you are interested in.</p>
+ *
+ * <h2><a name="2">2. How about some stubbing?</a></h2>
+ *
+ * <p>For an object:</p>
+ * <pre>
+ * var mockedString = mock(String);
+ *
+ * //stubbing
+ * when(mockedString).charAt(0).thenReturn('f');
+ * when(mockedString).charAt(1).thenThrow('An exception');
+ *
+ * //following alerts "f"
+ * alert(mockedString.charAt(0));
+ *
+ * //following throws exception 'An exception'
+ * mockedString.charAt(1);
+ *
+ * //following alerts "undefined" as charAt(999) was not stubbed
+ * alert(typeof (mockedString.charAt(999)));
+ *
+ * //can also verify a stubbed invocation, although this is usually redundant
+ * verify(mockedString).charAt(0);
+ * </pre>
+ *
+ * <p>For a function:</p>
+ * <pre>
+ * var mockedFunc = mockFunction();
+ *
+ * //stubbing
+ * when(mockedFunc)(0).thenReturn('f');
+ * when(mockedFunc)(1).thenThrow('An exception');
+ *
+ * //following alerts "f"
+ * alert(mockedFunc(0));
+ *
+ * //following throws exception 'An exception'
+ * mockedFunc(1);
+ *
+ * //following alerts "undefined" as charAt(999) was not stubbed
+ * alert(typeof (mockedFunc(999)));
+ *
+ * //can also verify a stubbed invocation, although this is usually redundant
+ * verify(mockedFunc)(0);
+ * </pre>
+ *
+ * <h2><a name="3">3. Matching Arguments</a></h2>
+ *
+ * <p>JsMockito verifiers arguments using 
+ * <a href="http://jshamcrest.destaquenet.com/">JsHamcrest</a> matchers.  If
+ * the argument provided during verification/stubbing is not a JsHamcrest
+ * matcher, then 'equalTo(arg)' is used instead.</p>
+ *
+ * <pre>
+ * var mockedString = mock(String);
+ * var mockedFunc = mockFunction();
+ *
+ * //stubbing using JsHamcrest
+ * when(mockedString).charAt(lessThan(10)).thenReturn('f');
+ * when(mockedFunc)(containsString('world')).thenReturn('foobar');
+ *
+ * //following alerts "f"
+ * alert(mockedString.charAt(5));
+ *
+ * //following alerts "foobar"
+ * alert(mockedFunc('hello world'));
+ *
+ * //you can also use matchers in verification
+ * verify(mockedString).charAt(greaterThan(4));
+ * verify(mockedFunc)(equalTo('hello world'));
+ * </pre>
  */
 JsMockito = {
   /**
@@ -23,6 +144,7 @@ JsMockito = {
 
   /**
    * Test if a given variable is a mock
+   *
    * @return {boolean} true if the variable is a mock
    */
   isMock: function(maybeMock) {
@@ -31,6 +153,7 @@ JsMockito = {
 
   /**
    * Add a stub for a mock object method or mock function
+   *
    * @param mock A mock object or mock anonymous function
    * @return {object or function} A stub builder on which the method or
    * function to be stubbed can be invoked
@@ -41,6 +164,7 @@ JsMockito = {
 
   /**
    * Verify that a mock object method or mock function was invoked
+   *
    * @param mock A mock object or mock anonymous function
    * @return {object or function} A verifier on which the method or function to
    *   be verified can be invoked
@@ -51,6 +175,7 @@ JsMockito = {
 
   /**
    * Verify that no mock object methods or the mock function was never invoked
+   *
    * @param mock A mock object or mock anonymous function
    */
   verifyZeroInteractions: function(mock) {
@@ -61,6 +186,7 @@ JsMockito = {
    * Create a mock that proxies a real function or object.  All un-stubbed
    * invocations will be passed through to the real implementation, but can
    * still be verified.
+   *
    * @param {object or function} delegate A 'real' (concrete) object or
    * function that the mock will delegate unstubbed invocations to
    * @return {object or function} A mock object (as per mock) or mock function
