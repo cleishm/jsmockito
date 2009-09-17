@@ -79,8 +79,8 @@ Mockitos are also good for spys
 -------------------------------
 
 Real super spies don't drink martinis - they go for mockitos. And just like
-Mockito, JsMockito supports 'spying' on real functions and objects and verifing
-how they were interacted with.
+Mockito, JsMockito supports 'spying' (e.g. partial mocking) on real functions
+and objects and verifing how they were interacted with.
 
 An example with functions:
 
