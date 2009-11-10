@@ -68,13 +68,11 @@ Screw.Unit(function() {
         );
       });
 
-/*
       it("should verify that method was not invoked twice", function() {
         assertThat(function() {
           verify(mockObj, times(2)).greeting();
-        }, throwsMessage("Wanted but not invoked: obj.greeting()"));
+        }, throwsMessage("Wanted 2 invocations but got 1: obj.greeting()"));
       });
-*/
 
       it("should not verify that the mock object had zero interactions", function() {
         assertThat(function() {

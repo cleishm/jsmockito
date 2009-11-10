@@ -101,13 +101,11 @@ Screw.Unit(function() {
           }, throwsMessage("Wanted but not invoked: func(<anything>)"));
         });
 
-/*
         it("should not verify that the mock function was invoked more than once", function() {
           assertThat(function() {
             verify(mockFunc, times(2))();
-          }, throwsMessage("Wanted but not invoked: func()"));
+          }, throwsMessage("Wanted 2 invocations but got 1: func()"));
         });
-*/
 
         it("should verify that the mock function was never invoked with arguments", function() {
           verify(mockFunc, never())('summer', 69);
@@ -122,7 +120,6 @@ Screw.Unit(function() {
         });
       });
 
-/*
       describe("when mock function invoked twice with no arguments", function() { 
         var context;
         before(function() {
@@ -134,7 +131,7 @@ Screw.Unit(function() {
         it("should not verify that the mock function was invoked more once", function() {
           assertThat(function() {
             verify(mockFunc)();
-          }, throwsMessage("func() - invoked 2 times wanted 1 time"));
+          }, throwsMessage("Wanted 1 invocation but got 2: func()"));
         });
 
         it("should verify that mock function was invoked twice", function() {
@@ -144,10 +141,9 @@ Screw.Unit(function() {
         it("should not verify that the mock function was invoked more than twice", function() {
           assertThat(function() {
             verify(mockFunc, times(3))();
-          }, throwsMessage("func() - invoked 2 times wanted 3 times"));
+          }, throwsMessage("Wanted 3 invocations but got 2: func()"));
         });
       });
-*/
 
       describe("when mock function invoked once with one argument", function() { 
         var context;
