@@ -64,10 +64,10 @@ JsMockito.Verifier.prototype = {
     });
   },
 
-  verifyInteractions: function(funcName, interactions, matchers, withContext) {
+  verifyInteractions: function(funcName, interactions, matchers, describeContext) {
   },
 
-  buildDescription: function(message, funcName, matchers, withContext) {
+  buildDescription: function(message, funcName, matchers, describeContext) {
     var description = new JsHamcrest.Description();
     description.append(message + ': ' + funcName + '(');
     JsMockito.each(matchers.slice(1), function(matcher, i) {
@@ -78,7 +78,7 @@ JsMockito.Verifier.prototype = {
       description.append('>');
     });
     description.append(")");
-    if (withContext) {
+    if (describeContext) {
       description.append(", 'this' being ");
       matchers[0].describeTo(description);
     }
@@ -91,7 +91,7 @@ JsMockito.verifier('Times', {
     this.wanted = wanted;
   },
 
-  verifyInteractions: function(funcName, interactions, matchers, withContext) {
+  verifyInteractions: function(funcName, interactions, matchers, describeContext) {
     var interactions = JsMockito.grep(interactions, function(interaction) {
       return JsMockito.matchArray(matchers, interaction);
     });
@@ -109,7 +109,7 @@ JsMockito.verifier('Times', {
       message = 'Wanted ' + this.wanted + ' invocations but got ' + interactions.length;
     }
 
-    var description = this.buildDescription(message, funcName, matchers, withContext);
+    var description = this.buildDescription(message, funcName, matchers, describeContext);
     throw description.get();
   }
 });
