@@ -29,5 +29,45 @@ JsMockito.Integration = {
    */
   screwunit: function() {
     JsMockito.Integration.importTo(Screw.Matchers);
+  },
+
+  /**
+   * Make the public JsMockito API available to JsTestDriver
+   * @see JsMockito.Integration.importTo(window)
+   */
+  JsTestDriver: function() {
+    JsMockito.Integration.importTo(window);
+  },
+
+  /**
+   * Make the public JsMockito API available to JsUnitTest
+   * @see JsMockito.Integration.importTo(JsUnitTest.Unit.Testcase.prototype)
+   */
+  JsUnitTest: function() {
+    JsMockito.Integration.importTo(JsUnitTest.Unit.Testcase.prototype);
+  },
+
+  /**
+   * Make the public JsMockito API available to YUITest
+   * @see JsMockito.Integration.importTo(window)
+   */
+  YUITest: function() {
+    JsMockito.Integration.importTo(window);
+  },
+
+  /**
+   * Make the public JsMockito API available to QUnit
+   * @see JsMockito.Integration.importTo(window)
+   */
+  QUnit: function() {
+    JsMockito.Integration.importTo(window);
+  },
+
+  /**
+   * Make the public JsMockito API available to jsUnity
+   * @see JsMockito.Integration.importTo(jsUnity.env.defaultScope)
+   */
+  jsUnity: function() {
+    JsMockito.Integration.importTo(jsUnity.env.defaultScope);
   }
 };
