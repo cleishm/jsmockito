@@ -50,6 +50,7 @@ JsMockito.mockFunction = function(funcName, delegate) {
   };
 
   mockFunc._jsMockitoStubBuilder = function(contextMatcher) {
+    var contextMatcher = contextMatcher || JsHamcrest.Matchers.anything();
     return matcherCaptureFunction(contextMatcher, function(matchers) {
       var stubMatch = [matchers, []];
       stubMatchers.push(stubMatch);
@@ -72,7 +73,8 @@ JsMockito.mockFunction = function(funcName, delegate) {
     });
   };
 
-  mockFunc._jsMockitoVerifier = function(contextMatcher, verifier) {
+  mockFunc._jsMockitoVerifier = function(verifier, contextMatcher) {
+    var contextMatcher = contextMatcher || JsHamcrest.Matchers.anything();
     return matcherCaptureFunction(contextMatcher, function(matchers) {
       return verifier(funcName, interactions, matchers, matchers[0] != contextMatcher);
     });

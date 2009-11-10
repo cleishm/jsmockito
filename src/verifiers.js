@@ -59,7 +59,7 @@ JsMockito.Verifier.prototype = {
 
   verify: function(mock) {
     var self = this;
-    return mock._jsMockitoVerifier(JsHamcrest.Matchers.anything(), function() {
+    return mock._jsMockitoVerifier(function() {
       self.verifyInteractions.apply(self, arguments);
     });
   },

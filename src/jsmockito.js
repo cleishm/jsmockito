@@ -159,7 +159,7 @@ JsMockito = {
    * function to be stubbed can be invoked
    */
   when: function(mock) {
-    return mock._jsMockitoStubBuilder(JsHamcrest.Matchers.anything());
+    return mock._jsMockitoStubBuilder();
   },
 
   /**

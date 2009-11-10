@@ -45,7 +45,7 @@ JsMockito.mock = function(Obj) {
   var stubBuilders = {};
   var verifiers = {};
   
-  var contextMatcher = JsHamcrest.Matchers.equalTo(mockObject);
+  var contextMatcher = JsHamcrest.Matchers.sameAs(mockObject);
 
   var addMockMethod = function(name) {
     var delegateMethod;
@@ -74,23 +74,17 @@ JsMockito.mock = function(Obj) {
   }
 
   mockObject._jsMockitoStubBuilder = function() {
-    var delegateArgs = [contextMatcher].concat(
-      Array.prototype.slice.call(arguments, 1));
-
     var stubBuilderObject = new MockObject();
     for (var name in stubBuilders) {
-      stubBuilderObject[name] = stubBuilders[name].apply(this, delegateArgs);
+      stubBuilderObject[name] = stubBuilders[name].call(this, contextMatcher);
     }
     return stubBuilderObject;
   };
 
-  mockObject._jsMockitoVerifier = function() {
-    var delegateArgs = [contextMatcher].concat(
-      Array.prototype.slice.call(arguments, 1));
-
+  mockObject._jsMockitoVerifier = function(verifier) {
     var verifierObject = new MockObject();
     for (var name in verifiers) {
-      verifierObject[name] = verifiers[name].apply(this, delegateArgs);
+      verifierObject[name] = verifiers[name].call(this, verifier, contextMatcher);
     }
     return verifierObject;
   };
