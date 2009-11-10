@@ -33,7 +33,7 @@ JsMockito.mockFunction = function(funcName, delegate) {
   var mockFunc = function() {
     var args = [this];
     args.push.apply(args, arguments);
-    interactions.push(args);
+    interactions.push({args: args});
 
     var stubMatcher = JsMockito.find(stubMatchers, function(stubMatcher) {
       return JsMockito.matchArray(stubMatcher[0], args);

@@ -93,7 +93,7 @@ JsMockito.verifier('Times', {
 
   verifyInteractions: function(funcName, interactions, matchers, describeContext) {
     var interactions = JsMockito.grep(interactions, function(interaction) {
-      return JsMockito.matchArray(matchers, interaction);
+      return JsMockito.matchArray(matchers, interaction.args);
     });
     if (interactions.length == this.wanted)
       return;
