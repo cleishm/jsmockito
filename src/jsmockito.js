@@ -19,15 +19,15 @@
  *  <li><a href="#1">Let's verify some behaviour!</a></li>
  *  <li><a href="#2">How about some stubbing?</a></li>
  *  <li><a href="#3">Matching Arguments</a></li>
- *  <li><a href="#4">Matching the context ('this')</a></li>
- *  <li><a href="#5">Verifying exact number of invocations / at least once /
+ *  <li><a href="#4">Verifying exact number of invocations / at least once /
  *  never</a></li>
- *  <li><a href="#6">Making sure invocations never happened on a mock</a></li>
+ *  <li><a href="#5">Matching the context ('this')</a></li>
+ *  <li><a href="#6">Making sure interactions never happened on a mock</a></li>
  * </ol>
  *
- * <p>In the following examples object mocking is done with Array and String as
- * these are well understood, although you probably wouldn't mock these in
- * normal test development.</p>
+ * <p>In the following examples object mocking is done with Array as this is
+ * well understood, although you probably wouldn't mock this in normal test
+ * development.</p>
  *
  * <h2><a name="1">1. Let's verify some behaviour!</a></h2>
  *
@@ -68,23 +68,23 @@
  *
  * <p>For an object:</p>
  * <pre>
- * var mockedString = mock(String);
+ * var mockedArray = mock(Array);
  *
  * //stubbing
- * when(mockedString).charAt(0).thenReturn('f');
- * when(mockedString).charAt(1).thenThrow('An exception');
+ * when(mockedArray).slice(0).thenReturn('f');
+ * when(mockedArray).slice(1).thenThrow('An exception');
  *
- * //following alerts "f"
- * alert(mockedString.charAt(0));
+ * //following returns "f"
+ * mockedArray.slice(0);
  *
  * //following throws exception 'An exception'
- * mockedString.charAt(1);
+ * mockedArray.slice(1);
  *
- * //following alerts "undefined" as charAt(999) was not stubbed
- * alert(typeof (mockedString.charAt(999)));
+ * //following returns undefined as slice(999) was not stubbed
+ * mockedArray.slice(999);
  *
  * //can also verify a stubbed invocation, although this is usually redundant
- * verify(mockedString).charAt(0);
+ * verify(mockedArray).slice(0);
  * </pre>
  *
  * <p>For a function:</p>
@@ -95,43 +95,145 @@
  * when(mockedFunc)(0).thenReturn('f');
  * when(mockedFunc)(1).thenThrow('An exception');
  *
- * //following alerts "f"
- * alert(mockedFunc(0));
+ * //following returns "f"
+ * mockedFunc(0);
  *
  * //following throws exception 'An exception'
  * mockedFunc(1);
  *
- * //following alerts "undefined" as charAt(999) was not stubbed
- * alert(typeof (mockedFunc(999)));
+ * //following returns undefined as mockedFunc(999) was not stubbed
+ * mockedFunc(999)
  *
  * //can also verify a stubbed invocation, although this is usually redundant
  * verify(mockedFunc)(0);
  * </pre>
  *
+ * <ul>
+ * <li>By default mocks return undefined from all invocations;</li>
+ * <li>Stubs can be overwritten;</li>
+ * <li>Once stubbed, the method will always return the stubbed value regardless
+ * of how many times it is called;</li>
+ * <li>Last stubbing is more important - when you stubbed the same method with
+ * the same (or overlapping) matchers many times.</li>
+ * </ul>
+ *
  * <h2><a name="3">3. Matching Arguments</a></h2>
  *
- * <p>JsMockito verifiers arguments using 
- * <a href="http://jshamcrest.destaquenet.com/">JsHamcrest</a> matchers.  If
- * the argument provided during verification/stubbing is not a JsHamcrest
- * matcher, then 'equalTo(arg)' is used instead.</p>
+ * <p>JsMockito verifies arguments using 
+ * <a href="http://jshamcrest.destaquenet.com/">JsHamcrest</a> matchers.
  *
  * <pre>
- * var mockedString = mock(String);
+ * var mockedArray = mock(Array);
  * var mockedFunc = mockFunction();
  *
  * //stubbing using JsHamcrest
- * when(mockedString).charAt(lessThan(10)).thenReturn('f');
+ * when(mockedArray).slice(lessThan(10)).thenReturn('f');
  * when(mockedFunc)(containsString('world')).thenReturn('foobar');
  *
- * //following alerts "f"
- * alert(mockedString.charAt(5));
+ * //following returns "f"
+ * mockedArray.slice(5);
  *
- * //following alerts "foobar"
- * alert(mockedFunc('hello world'));
+ * //following returns "foobar"
+ * mockedFunc('hello world');
  *
  * //you can also use matchers in verification
- * verify(mockedString).charAt(greaterThan(4));
+ * verify(mockedArray).slice(greaterThan(4));
  * verify(mockedFunc)(equalTo('hello world'));
+ *
+ * //if not specified then the matcher is anything(), thus either of these
+ * //will match an invocation with a single argument
+ * verify(mockedFunc)();
+ * verify(mockedFunc)(anything());
+ * </pre>
+ *
+ * <ul>
+ * <li>If the argument provided during verification/stubbing is not a
+ * JsHamcrest matcher, then 'equalTo(arg)' is used instead;</li>
+ * <li>Where a function/method was invoked with an argument, but the stub or
+ * verification does not provide a matcher, then anything() is assumed;</li>
+ * <li>The reverse, however, is not true - the anything() matcher will
+ * <em>not</em> match an argument that was never provided.</li>
+ * </ul>
+ *
+ * <h2><a name="4">4. Verifying exact number of invocations / at least once /
+ * never</a></h2>
+ *
+ * <pre>
+ * var mockedArray = mock(Array);
+ * var mockedFunc = mockFunction();
+ *
+ * mockedArray.slice(5);
+ * mockedArray.slice(6);
+ * mockedFunc('a');
+ * mockedFunc('b');
+ *
+ * //verification of multiple matching invocations
+ * verify(mockedArray, times(2)).slice(anything());
+ * verify(mockedFunc, times(2))(anything());
+ *
+ * //the default is times(1), making these are equivalent
+ * verify(mockedArray, times(1)).slice(5);
+ * verify(mockedArray).slice(5);
+ * </pre>
+ *
+ * <h2><a name="5">5. Matching the context ('this')</a></h2>
+ * 
+ * Functions can be invoked with a specific context, using the 'call' or
+ * 'apply' methods. JsMockito mock functions (and mock object methods)
+ * will remember this context and verification/stubbing can match on it.
+ *
+ * <p>For a function:</p>
+ * <pre>
+ * var mockedFunc = mockFunction();
+ * var context1 = {};
+ * var context2 = {};
+ *
+ * when(mockedFunc).call(equalTo(context2), anything()).thenReturn('hello');
+ *
+ * mockedFunc.call(context1, 'foo');
+ * //the following returns 'hello'
+ * mockedFunc.apply(context2, [ 'bar' ]);
+ *
+ * verify(mockedFunc).apply(context1, [ 'foo' ]);
+ * verify(mockedFunc).call(context2, 'bar');
+ * </pre>
+
+ * <p>For object method invocations, the context is usually the object itself.
+ * But sometimes people do strange things, and you need to test it - so
+ * the same approach can be used for an object:</p>
+ * <pre>
+ * var mockedArray = mock(Array);
+ * var otherContext = {};
+ *
+ * when(mockedArray).slice.call(otherContext, 5).thenReturn('h');
+ *
+ * //the following returns 'h'
+ * mockedArray.slice.apply(otherContext, [ 5 ]);
+ *
+ * verify(mockedArray).slice.call(equalTo(otherContext), 5);
+ * </pre>
+ *
+ * <ul>
+ * <li>For mock functions, the default context matcher is anything();</li>
+ * <li>For mock object methods, the default context matcher is
+ * sameAs(mockObj).</li>
+ * </ul>
+ *
+ * <h2><a name="6">6. Making sure interactions never happened on a mock</a></h2>
+ * 
+ * <pre>
+ * var mockOne = mock(Array);
+ * var mockTwo = mock(Array);
+ * var mockThree = mockFunction();
+ * 
+ * //only mockOne is interacted with
+ * mockOne.push(5);
+ *
+ * //verify a method was never called
+ * verify(mockOne, never()).unshift('a');
+ * 
+ * //verify that other mocks were not interacted with
+ * verifyZeroInteractions(mockTwo, mockThree);
  * </pre>
  */
 JsMockito = {
@@ -145,6 +247,7 @@ JsMockito = {
   /**
    * Test if a given variable is a mock
    *
+   * @param maybeMock An object
    * @return {boolean} true if the variable is a mock
    */
   isMock: function(maybeMock) {
@@ -166,6 +269,7 @@ JsMockito = {
    * Verify that a mock object method or mock function was invoked
    *
    * @param mock A mock object or mock anonymous function
+   * @param verifier Optional JsMockito.Verifier instance (default: JsMockito.Verifiers.once())
    * @return {object or function} A verifier on which the method or function to
    *   be verified can be invoked
    */
@@ -174,12 +278,14 @@ JsMockito = {
   },
 
   /**
-   * Verify that no mock object methods or the mock function was never invoked
+   * Verify that no mock object methods or the mock function were ever invoked
    *
-   * @param mock A mock object or mock anonymous function
+   * @param mock A mock object or mock anonymous function (multiple accepted)
    */
-  verifyZeroInteractions: function(mock) {
-    JsMockito.Verifiers.zeroInteractions().verify(mock);
+  verifyZeroInteractions: function() {
+    JsMockito.each(arguments, function(mock) {
+      JsMockito.Verifiers.zeroInteractions().verify(mock);
+    });
   },
 
   /**
