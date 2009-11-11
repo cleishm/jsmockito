@@ -71,6 +71,22 @@ Screw.Unit(function() {
           verifyZeroInteractions(mockObj);
         }, throwsMessage("Never wanted but invoked: obj.greeting()"));
       });
+
+      it("should not verify that the mock object had no more interactions", function() {
+        assertThat(function() {
+          verifyNoMoreInteractions(mockObj);
+        }, throwsMessage("No interactions wanted, but 1 remains: obj.greeting()"));
+      });
+
+      describe("when verified", function() {
+        before(function() {
+          verify(mockObj).greeting();
+        });
+
+        it("should verify that mock object had no more interactions", function() {
+          verifyNoMoreInteractions(mockObj);
+        });
+      });
     });
 
     describe("when mock method invocked with multiple arguments", function() {

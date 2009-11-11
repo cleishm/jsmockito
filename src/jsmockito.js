@@ -242,7 +242,8 @@ JsMockito = {
    */
   version: '@VERSION',
 
-  _export: ['isMock', 'when', 'verify', 'verifyZeroInteractions', 'spy'],
+  _export: ['isMock', 'when', 'verify', 'verifyZeroInteractions',
+            'verifyNoMoreInteractions', 'spy'],
 
   /**
    * Test if a given variable is a mock
@@ -271,7 +272,7 @@ JsMockito = {
    * @param mock A mock object or mock anonymous function
    * @param verifier Optional JsMockito.Verifier instance (default: JsMockito.Verifiers.once())
    * @return {object or function} A verifier on which the method or function to
-   *   be verified can be invoked
+   * be verified can be invoked
    */
   verify: function(mock, verifier) {
     return (verifier || JsMockito.Verifiers.once()).verify(mock);
@@ -285,6 +286,18 @@ JsMockito = {
   verifyZeroInteractions: function() {
     JsMockito.each(arguments, function(mock) {
       JsMockito.Verifiers.zeroInteractions().verify(mock);
+    });
+  },
+
+  /**
+   * Verify that no mock object method or mock function invocations remain
+   * unverified
+   *
+   * @param mock A mock object or mock anonymous function (multiple accepted)
+   */
+  verifyNoMoreInteractions: function() {
+    JsMockito.each(arguments, function(mock) {
+      JsMockito.Verifiers.noMoreInteractions().verify(mock);
     });
   },
 

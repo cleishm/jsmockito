@@ -118,6 +118,22 @@ Screw.Unit(function() {
             verifyZeroInteractions(mockFunc);
           }, throwsMessage("Never wanted but invoked: func()"));
         });
+
+        it("should not verify that the mock function has no more interactions", function() {
+          assertThat(function() {
+            verifyNoMoreInteractions(mockFunc);
+          }, throwsMessage("No interactions wanted, but 1 remains: func()"));
+        });
+
+        describe("when verified", function() {
+          before(function() {
+            verify(mockFunc)();
+          });
+
+          it("should verify that mock function had no more interactions", function() {
+            verifyNoMoreInteractions(mockFunc);
+          });
+        });
       });
 
       describe("when mock function invoked twice with no arguments", function() { 

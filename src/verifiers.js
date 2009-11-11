@@ -5,7 +5,7 @@
  * @namespace
  */
 JsMockito.Verifiers = {
-  _export: ['never', 'zeroInteractions', 'times', 'once'],
+  _export: ['never', 'zeroInteractions', 'noMoreInteractions', 'times', 'once'],
 
   /**
    * Test that a invocation never occurred. For example:
@@ -26,6 +26,17 @@ JsMockito.Verifiers = {
    */
   zeroInteractions: function() {
     return new JsMockito.Verifiers.ZeroInteractions();
+  },
+
+  /** Test that no further interactions remain unverified on the mock.  For
+   * example:
+   * <pre>
+   * verify(mock, noMoreInteractions());
+   * </pre>
+   * @see JsMockito.verifyNoMoreInteractions()
+   */
+  noMoreInteractions: function() {
+    return new JsMockito.Verifiers.NoMoreInteractions();
   },
 
   /**
@@ -67,6 +78,12 @@ JsMockito.Verifier.prototype = {
   verifyInteractions: function(funcName, interactions, matchers, describeContext) {
   },
 
+  updateVerifiedInteractions: function(interactions) {
+    JsMockito.each(interactions, function(interaction) {
+      interaction.verified = true;
+    });
+  },
+
   buildDescription: function(message, funcName, matchers, describeContext) {
     var description = new JsHamcrest.Description();
     description.append(message + ': ' + funcName + '(');
@@ -91,12 +108,14 @@ JsMockito.verifier('Times', {
     this.wanted = wanted;
   },
 
-  verifyInteractions: function(funcName, interactions, matchers, describeContext) {
-    var interactions = JsMockito.grep(interactions, function(interaction) {
+  verifyInteractions: function(funcName, allInteractions, matchers, describeContext) {
+    var interactions = JsMockito.grep(allInteractions, function(interaction) {
       return JsMockito.matchArray(matchers, interaction.args);
     });
-    if (interactions.length == this.wanted)
+    if (interactions.length == this.wanted) {
+      this.updateVerifiedInteractions(interactions);
       return;
+    }
 
     var message;
     if (interactions.length == 0) {
@@ -120,5 +139,27 @@ JsMockito.verifier('ZeroInteractions', {
     JsMockito.each(mock._jsMockitoMockFunctions(), function(mockFunc) {
       neverVerifier.verify(mockFunc)();
     });
+  }
+});
+
+JsMockito.verifier('NoMoreInteractions', {
+  verify: function(mock) {
+    var self = this;
+    JsMockito.each(mock._jsMockitoMockFunctions(), function(mockFunc) {
+      JsMockito.Verifier.prototype.verify.call(self, mockFunc)();
+    });
+  },
+
+  verifyInteractions: function(funcName, allInteractions, matchers, describeContext) {
+    var interactions = JsMockito.grep(allInteractions, function(interaction) {
+      return interaction.verified != true;
+    });
+    if (interactions.length == 0)
+      return;
+    
+    var description = this.buildDescription(
+      "No interactions wanted, but " + interactions.length + " remains",
+      funcName, matchers, describeContext);
+    throw description.get();
   }
 });

@@ -124,6 +124,83 @@ Screw.Unit(function() {
       });
     });
 
+    describe('#noMoreInteractions', function() {
+      describe('when verifing mock functions', function() {
+        var mockFunc;
+        before(function() {
+          mockFunc = mockFunction();
+        });
+
+        describe('when function never invoked', function() {
+          it('should verify', function() {
+            verify(mockFunc, noMoreInteractions());
+          });
+        });
+
+        describe('when all interactions have been verified', function() {
+          before(function() {
+            mockFunc(42, 'hi');
+            mockFunc(31, 'bye');
+            verify(mockFunc, times(2))(anything(), anything());
+          });
+          it('should verify', function() {
+            verify(mockFunc, noMoreInteractions());
+          });
+        });
+
+        describe('when interactions remain unverified', function() {
+          before(function() {
+            mockFunc(42, 'hi');
+            mockFunc(31, 'bye');
+            verify(mockFunc)(31, 'bye');
+          });
+          it('should not verify', function() {
+            assertThat(function() {
+              verify(mockFunc, noMoreInteractions());
+            }, throwsMessage("No interactions wanted, but 1 remains: func()"));
+          });
+        });
+      });
+
+      describe('when verifing mock object methods', function() {
+        var mockObj;
+        before(function() {
+          mockObj = mock(MyObject);
+        });
+
+        describe('when methods never invoked', function() {
+          it('should verify', function() {
+            verify(mockObj, noMoreInteractions());
+          });
+        });
+
+        describe('when all interactions have been verified', function() {
+          before(function() {
+            mockObj.greeting(42, 'hi');
+            mockObj.farewell(31, 'bye');
+            verify(mockObj).greeting(anything(), anything());
+            verify(mockObj).farewell(anything(), anything());
+          });
+          it('should verify', function() {
+            verify(mockObj, noMoreInteractions());
+          });
+        });
+
+        describe('when interactions remain unverified', function() {
+          before(function() {
+            mockObj.greeting(42, 'hi');
+            mockObj.farewell(31, 'bye');
+            verify(mockObj).greeting(anything(), anything());
+          });
+          it('should not verify', function() {
+            assertThat(function() {
+              verify(mockObj, noMoreInteractions());
+            }, throwsMessage("No interactions wanted, but 1 remains: obj.farewell()"));
+          });
+        });
+      });
+    });
+
     describe('#once', function() {
       describe('when verifing mock functions', function() {
         var mockFunc;
