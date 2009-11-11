@@ -1,14 +1,6 @@
 // vi:ts=2 sw=2 expandtab
 Screw.Unit(function() {
   describe('JsMockito object mocking', function() {
-    var MyObject;
-
-    before(function() {
-      MyObject = function() {
-        this.greeting = function() { return "hello" };
-        this.farewell = function() { return "goodbye" };
-      };
-    });
 
     describe("when mock object created", function() {
       var mockObj;

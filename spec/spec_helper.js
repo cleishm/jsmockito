@@ -1,3 +1,4 @@
+// vi:ts=2 sw=2 expandtab
 JsHamcrest.Integration.screwunit();
 JsMockito.Integration.screwunit();
 
@@ -21,3 +22,8 @@ Screw.Matchers.throwsMessage = function(exceptionText) {
     }
   });
 }
+
+var MyObject = function() {
+  this.greeting = function() { return "hello" };
+  this.farewell = function() { return "goodbye" };
+};
