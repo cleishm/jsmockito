@@ -23,6 +23,7 @@
  *  never</a></li>
  *  <li><a href="#5">Matching the context ('this')</a></li>
  *  <li><a href="#6">Making sure interactions never happened on a mock</a></li>
+ *  <li><a href="#7">Finding redundant invocations</a></li>
  * </ol>
  *
  * <p>In the following examples object mocking is done with Array as this is
@@ -197,7 +198,7 @@
  * verify(mockedFunc).apply(context1, [ 'foo' ]);
  * verify(mockedFunc).call(context2, 'bar');
  * </pre>
-
+ *
  * <p>For object method invocations, the context is usually the object itself.
  * But sometimes people do strange things, and you need to test it - so
  * the same approach can be used for an object:</p>
@@ -234,6 +235,20 @@
  * 
  * //verify that other mocks were not interacted with
  * verifyZeroInteractions(mockTwo, mockThree);
+ * </pre>
+ *
+ * <h2><a name="7">7. Finding redundant invocations</a></h2>
+ *
+ * <pre>
+ * var mockArray = mock(Array);
+ * 
+ * mockArray.push(5);
+ * mockArray.push(8);
+ *
+ * verify(mockArray).push(5);
+ *
+ * // following verification will fail
+ * verifyNoMoreInteractions(mockArray);
  * </pre>
  */
 JsMockito = {
