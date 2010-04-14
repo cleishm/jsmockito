@@ -124,7 +124,7 @@ into it. If you're integrating with <a href="http://github.com/nkallen/screw-uni
 
 <pre>
     mockFunc = mockFunction();
-    when(mockFunc).call(this, anything()).then(function(arg) {
+    when(mockFunc)(anything()).then(function(arg) {
       return "foo " + arg;
     });
   
@@ -155,7 +155,7 @@ how they were interacted with.</p>
     mockFunc("hello world");
     // -- end code under test --
 
-    verify(mockFunc).call(anything(), "hello world");
+    verify(mockFunc)("hello world");
 </pre>
 
 <p>or with objects:</p>
