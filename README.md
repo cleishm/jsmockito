@@ -62,7 +62,7 @@ Or you can stub method calls:
 For a JavaScript twist, you can also mock functions:
 
     mockFunc = mockFunction();
-    when(mockFunc).call(this, anything()).then(function(arg) {
+    when(mockFunc)(anything()).then(function(arg) {
       return "foo " + arg;
     });
   
@@ -92,7 +92,7 @@ An example with functions:
     mockFunc("hello world");
     // -- end code under test --
 
-    verify(mockFunc).call(anything(), "hello world");
+    verify(mockFunc)("hello world");
 
 or with objects:
 
