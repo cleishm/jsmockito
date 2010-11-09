@@ -69,5 +69,13 @@ JsMockito.Integration = {
    */
   jsUnity: function() {
     JsMockito.Integration.importTo(jsUnity.env.defaultScope);
+  },
+
+  /**
+   * Make the public JsMockito API available to jSpec
+   * @see JsMockito.Integration.importTo(jSpec.defaultContext)
+   */
+  jSpec: function() {
+    JsMockito.Integration.importTo(jSpec.defaultContext);
   }
 };
