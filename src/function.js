@@ -50,7 +50,6 @@ JsMockito.mockFunction = function(funcName, delegate) {
   };
 
   mockFunc.prototype = delegate.prototype;
-  mockFunc.calls = [];
 
   mockFunc._jsMockitoStubBuilder = function(contextMatcher) {
     var contextMatcher = contextMatcher || JsHamcrest.Matchers.anything();
