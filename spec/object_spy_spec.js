@@ -79,5 +79,22 @@ Screw.Unit(function() {
         });
       });
     });
+
+    describe("when spying on a constructor", function() {
+      MyObject.prototype = {
+        foo: function() { return "bar" }
+      };
+
+      var proxyConstructor;
+      before(function() {
+        ProxyObject = spy(MyObject);
+      });
+
+      it("should construct objects correctly", function() {
+        var obj = new ProxyObject(1);
+        obj.foo();
+        verify(ProxyObject)(1);
+      });
+    });
   });
 });
