@@ -1,3 +1,8 @@
+Changed in 1.0.3 (2011-02-21)
+=============================
+
+Added jSpec integration and support for spying on constructors (courtesy of Ben Cherry https://github.com/bcherry).
+
 Changed in 1.0.2 (2010-01-21)
 =============================
 
