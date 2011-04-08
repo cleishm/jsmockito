@@ -12,15 +12,13 @@ JsMockito.Integration = {
    * the functions from the public JsMockito API
    */
   importTo: function(target) {
-    for (var i = JsMockito._export.length; i > 0; --i) {
-      var exported = JsMockito._export[i-1];
+    JsMockito.each(JsMockito._export, function(exported) {
       target[exported] = JsMockito[exported];
-    }
+    });
 
-    for (var i = JsMockito.Verifiers._export.length; i > 0; --i) {
-      var exported = JsMockito.Verifiers._export[i-1];
+    JsMockito.each(JsMockito.Verifiers._export, function(exported) {
       target[exported] = JsMockito.Verifiers[exported];
-    }
+    });
   },
 
   /**

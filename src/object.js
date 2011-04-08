@@ -51,8 +51,8 @@ JsMockito.mock = function(Obj) {
     var delegateMethod;
     if (delegate[name] != undefined) {
       delegateMethod = function() {
-        var scope = (this == mockObject)? delegate : this;
-        return delegate[name].apply(scope, arguments);
+        var context = (this == mockObject)? delegate : this;
+        return delegate[name].apply(context, arguments);
       };
     }
     mockObject[name] = JsMockito.mockFunction('obj.' + name, delegateMethod);
@@ -67,9 +67,9 @@ JsMockito.mock = function(Obj) {
 
   for (var typeName in JsMockito.nativeTypes) {
     if (mockObject instanceof JsMockito.nativeTypes[typeName].type) {
-      for (var i = 0; i < JsMockito.nativeTypes[typeName].methods.length; ++i) {
-        addMockMethod(JsMockito.nativeTypes[typeName].methods[i]);
-      }
+      JsMockito.each(JsMockito.nativeTypes[typeName].methods, function(method) {
+        addMockMethod(method);
+      });
     }
   }
 
