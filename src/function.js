@@ -55,7 +55,7 @@ JsMockito.mockFunction = function(funcName, delegate) {
     var contextMatcher = contextMatcher || JsHamcrest.Matchers.anything();
     return matcherCaptureFunction(contextMatcher, function(matchers) {
       var stubMatch = [matchers, []];
-      stubMatchers.push(stubMatch);
+      stubMatchers.unshift(stubMatch);
       return {
         then: function() {
           stubMatch[1].push.apply(stubMatch[1], arguments);
