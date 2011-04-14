@@ -51,6 +51,21 @@ Screw.Unit(function() {
         verify(mockedArray).slice(0);
       });
 
+      it("should use last stub for object methods", function() {
+        function Worker() {
+          this.doSomething = function(){};
+        }
+        var mockedWorker = mock(Worker);
+
+
+        //stubbing
+        when(mockedWorker).doSomething().thenReturn('doing_first');
+        when(mockedWorker).doSomething().thenReturn('doing_second');
+
+        //following returns "f"
+        assertThat(mockedWorker.doSomething(), equalTo("doing_second"));
+      });
+
       it("should stub functions", function() {
         var mockedFunc = mockFunction();
 
