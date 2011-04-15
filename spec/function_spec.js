@@ -469,6 +469,25 @@ Screw.Unit(function() {
           assertThat(exception, equalTo('ex 3'));
         });
       });
+
+      describe("when mock function is stubbed again", function() {
+        before(function() {
+          when(mockFunc)('foo', anything()).thenReturn('result 1');
+          when(mockFunc)('foo', 'bar').thenReturn('result 2');
+        });
+
+        describe("when either stub match", function() {
+          it("should return the result of the last stub", function() {
+            assertThat(mockFunc('foo', 'bar'), equalTo('result 2'));
+          });
+        });
+
+        describe("when second stub does not match", function() {
+          it("should return the result of the first stub", function() {
+            assertThat(mockFunc('foo', 'foo'), equalTo('result 1'));
+          });
+        });
+      });
     });
 
     describe("when mock function is created with name", function() {
