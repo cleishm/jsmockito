@@ -74,19 +74,15 @@ JsMockito.mock = function(Obj) {
   }
 
   mockObject._jsMockitoStubBuilder = function() {
-    var stubBuilderObject = new MockObject();
-    for (var name in stubBuilders) {
-      stubBuilderObject[name] = stubBuilders[name].call(this, contextMatcher);
-    }
-    return stubBuilderObject;
+    return JsMockito.mapInto(new MockObject(), stubBuilders, function(method) {
+      return method.call(this, contextMatcher);
+    });
   };
 
   mockObject._jsMockitoVerifier = function(verifier) {
-    var verifierObject = new MockObject();
-    for (var name in verifiers) {
-      verifierObject[name] = verifiers[name].call(this, verifier, contextMatcher);
-    }
-    return verifierObject;
+    return JsMockito.mapInto(new MockObject(), verifiers, function(method) {
+      return method.call(this, verifier, contextMatcher);
+    });
   };
 
   mockObject._jsMockitoMockFunctions = function() {
