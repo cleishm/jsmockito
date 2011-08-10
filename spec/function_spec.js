@@ -144,7 +144,7 @@ Screw.Unit(function() {
           mockFunc();
         });
 
-        it("should not verify that the mock function was invoked more once", function() {
+        it("should not verify that the mock function was invoked once", function() {
           assertThat(function() {
             verify(mockFunc)();
           }, throwsMessage("Wanted 1 invocation but got 2: func()"));
@@ -225,6 +225,37 @@ Screw.Unit(function() {
           }, throwsMessage(
             "Wanted but not invoked: func(<equal to 1>, <equal to \"boo\">, <equal to " + args[2] + ">)")
           );
+        });
+      });
+
+      describe("when mock function invoked twice with different arguments", function() {
+        before(function() {
+          mockFunc('foo');
+          mockFunc('bar');
+        });
+
+        describe("when only first interaction verified", function() {
+          before(function() {
+            verify(mockFunc)('foo');
+          });
+
+          it("should not verify that mock function had no more interactions", function() {
+            assertThat(function() {
+              verifyNoMoreInteractions(mockFunc);
+            }, throwsMessage("No interactions wanted, but 1 remains: func()"));
+          });
+        });
+
+        describe("when only second interaction verified", function() {
+          before(function() {
+            verify(mockFunc)('bar');
+          });
+
+          it("should not verify that mock function had no more interactions", function() {
+            assertThat(function() {
+              verifyNoMoreInteractions(mockFunc);
+            }, throwsMessage("No interactions wanted, but 1 remains: func()"));
+          });
         });
       });
     });
