@@ -62,12 +62,12 @@ JsMockito.mockFunction = function(funcName, delegate) {
           return this;
         },
         thenReturn: function() {
-          this.then.apply(this, JsMockito.map(arguments, function(value) {
+          return this.then.apply(this,JsMockito.map(arguments, function(value) {
             return function() { return value };
           }));
         },
         thenThrow: function(exception) {
-          this.then.apply(this, JsMockito.map(arguments, function(value) {
+          return this.then.apply(this,JsMockito.map(arguments, function(value) {
             return function() { throw value };
           }));
         }

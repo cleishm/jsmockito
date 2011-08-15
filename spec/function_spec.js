@@ -402,7 +402,7 @@ Screw.Unit(function() {
         });
       });
 
-      describe("when mock function is stubbed multiple times using chained stubber", function() {
+      describe("when mock function is stubbed multiple times using chained stubber from then", function() {
         before(function() {
           when(mockFunc)('foo').then(function() { return 'func result' }).thenReturn('value result');
         });
@@ -418,6 +418,52 @@ Screw.Unit(function() {
 
         it("should return results of last stub for subsequent invocations", function() {
           mockFunc('foo');
+          mockFunc('foo');
+          assertThat(mockFunc('foo'), equalTo('value result'));
+          assertThat(mockFunc('foo'), equalTo('value result'));
+        });
+      });
+
+      describe("when mock function is stubbed multiple times using chained stubber from thenReturn", function() {
+        before(function() {
+          when(mockFunc)('foo').thenReturn('value result').then(function() { return 'func result' });
+        });
+
+        it("should return results of first stub first", function() {
+          assertThat(mockFunc('foo'), equalTo('value result'));
+        });
+
+        it("should return results of second stub second", function() {
+          mockFunc('foo');
+          assertThat(mockFunc('foo'), equalTo('func result'));
+        });
+
+        it("should return results of last stub for subsequent invocations", function() {
+          mockFunc('foo');
+          mockFunc('foo');
+          assertThat(mockFunc('foo'), equalTo('func result'));
+          assertThat(mockFunc('foo'), equalTo('func result'));
+        });
+      });
+
+      describe("when mock function is stubbed multiple times using chained stubber from thenThrow", function() {
+        before(function() {
+          when(mockFunc)('foo').thenThrow('ex result').thenReturn('value result');
+        });
+
+        it("should return results of first stub first", function() {
+          var exception;
+          try { mockFunc('foo') } catch (ex) { exception = ex };
+          assertThat(exception, equalTo('ex result'));
+        });
+
+        it("should return results of second stub second", function() {
+          try { mockFunc('foo') } catch (ex) { }
+          assertThat(mockFunc('foo'), equalTo('value result'));
+        });
+
+        it("should return results of last stub for subsequent invocations", function() {
+          try { mockFunc('foo') } catch (ex) { }
           mockFunc('foo');
           assertThat(mockFunc('foo'), equalTo('value result'));
           assertThat(mockFunc('foo'), equalTo('value result'));
