@@ -1,3 +1,17 @@
+Changed in 1.0.4 (2011-08-16)
+=============================
+
+Various bugfixes:
+- An issue where last stubbing was not preferred
+  (reported by Volodymyr Mykhailyk,
+   https://github.com/chrisleishman/jsmockito/issues/1)
+- An issue where mocked Arrays could not be validated with bulk validators
+  (reported by 'HitmanInWis',
+   https://github.com/chrisleishman/jsmockito/issues/5)
+- An issue where 'thenReturn' and 'thenThrow' stubs where not chaining
+  (reported by 'HitmanInWis',
+   https://github.com/chrisleishman/jsmockito/issues/6)
+
 Changed in 1.0.3 (2011-02-21)
 =============================
 
