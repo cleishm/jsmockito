@@ -74,15 +74,39 @@
  * //stubbing
  * when(mockedArray).slice(0).thenReturn('f');
  * when(mockedArray).slice(1).thenThrow('An exception');
+ * when(mockedArray).slice(2).then(function() { return 1+2 });
  *
- * //following returns "f"
- * mockedArray.slice(0);
+ * //the following returns "f"
+ * assertThat(mockedArray.slice(0), equalTo('f'));
  *
- * //following throws exception 'An exception'
- * mockedArray.slice(1);
+ * //the following throws exception 'An exception'
+ * var ex = undefined;
+ * try {
+ *   mockedArray.slice(1);
+ * } catch (e) {
+ *   ex = e;
+ * }
+ * assertThat(ex, equalTo('An exception');
  *
- * //following returns undefined as slice(999) was not stubbed
- * mockedArray.slice(999);
+ * //the following invokes the stub method, which returns 3
+ * assertThat(mockedArray.slice(2), equalTo(3));
+ *
+ * //the following returns undefined as slice(999) was not stubbed
+ * assertThat(mockedArray.slice(999), typeOf('undefined'));
+ *
+ * //stubs can take multiple values to return in order (same for 'thenThrow' and 'then' as well)
+ * when(mockedArray).pop().thenReturn('a', 'b', 'c');
+ * assertThat(mockedArray.pop(), equalTo('a'));
+ * assertThat(mockedArray.pop(), equalTo('b'));
+ * assertThat(mockedArray.pop(), equalTo('c'));
+ * assertThat(mockedArray.pop(), equalTo('c'));
+ *
+ * //stubs can also be chained to return values in order
+ * when(mockedArray).unshift().thenReturn('a').thenReturn('b').then(function() { return 'c' });
+ * assertThat(mockedArray.unshift(), equalTo('a'));
+ * assertThat(mockedArray.unshift(), equalTo('b'));
+ * assertThat(mockedArray.unshift(), equalTo('c'));
+ * assertThat(mockedArray.unshift(), equalTo('c'));
  *
  * //can also verify a stubbed invocation, although this is usually redundant
  * verify(mockedArray).slice(0);
@@ -95,15 +119,41 @@
  * //stubbing
  * when(mockedFunc)(0).thenReturn('f');
  * when(mockedFunc)(1).thenThrow('An exception');
+ * when(mockedFunc)(2).then(function() { return 1+2 });
  *
- * //following returns "f"
- * mockedFunc(0);
+ * //the following returns "f"
+ * assertThat(mockedFunc(0), equalTo('f'))
  *
  * //following throws exception 'An exception'
  * mockedFunc(1);
+ * //the following throws exception 'An exception'
+ * var ex = undefined;
+ * try {
+ *   mockedFunc(1);
+ * } catch (e) {
+ *   ex = e;
+ * }
+ * assertThat(ex, equalTo('An exception');
+ *
+ * //the following invokes the stub method, which returns 3
+ * assertThat(mockedFunc(2), equalTo(3));
  *
  * //following returns undefined as mockedFunc(999) was not stubbed
- * mockedFunc(999)
+ * assertThat(mockedFunc(999), typeOf('undefined'));
+ *
+ * //stubs can take multiple values to return in order (same for 'thenThrow' and 'then' as well)
+ * when(mockedFunc)(3).thenReturn('a', 'b', 'c');
+ * assertThat(mockedFunc(3), equalTo('a'));
+ * assertThat(mockedFunc(3), equalTo('b'));
+ * assertThat(mockedFunc(3), equalTo('c'));
+ * assertThat(mockedFunc(3), equalTo('c'));
+ *
+ * //stubs can also be chained to return values in order
+ * when(mockedFunc)(4).thenReturn('a').thenReturn('b').then(function() { return 'c' });
+ * assertThat(mockedFunc(4), equalTo('a'));
+ * assertThat(mockedFunc(4), equalTo('b'));
+ * assertThat(mockedFunc(4), equalTo('c'));
+ * assertThat(mockedFunc(4), equalTo('c'));
  *
  * //can also verify a stubbed invocation, although this is usually redundant
  * verify(mockedFunc)(0);
