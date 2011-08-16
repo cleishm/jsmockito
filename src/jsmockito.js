@@ -108,6 +108,13 @@
  * assertThat(mockedArray.unshift(), equalTo('c'));
  * assertThat(mockedArray.unshift(), equalTo('c'));
  *
+ * //stub matching can overlap, allowing for specific cases and defaults
+ * when(mockedArray).slice(3).thenReturn('abcde');
+ * when(mockedArray).slice(3, lessThan(0)).thenReturn('edcba');
+ * assertThat(mockedArray.slice(3, -1), equalTo('edcba'));
+ * assertThat(mockedArray.slice(3, 1), equalTo('abcde'));
+ * assertThat(mockedArray.slice(3), equalTo('abcde'));
+ *
  * //can also verify a stubbed invocation, although this is usually redundant
  * verify(mockedArray).slice(0);
  * </pre>
@@ -154,6 +161,13 @@
  * assertThat(mockedFunc(4), equalTo('b'));
  * assertThat(mockedFunc(4), equalTo('c'));
  * assertThat(mockedFunc(4), equalTo('c'));
+ *
+ * //stub matching can overlap, allowing for specific cases and defaults
+ * when(mockedFunc)(5).thenReturn('abcde')
+ * when(mockedFunc)(5, lessThan(0)).thenReturn('edcba')
+ * assertThat(mockedFunc(5, -1), equalTo('edcba'))
+ * assertThat(mockedFunc(5, 1), equalTo('abcde'))
+ * assertThat(mockedFunc(5), equalTo('abcde'))
  *
  * //can also verify a stubbed invocation, although this is usually redundant
  * verify(mockedFunc)(0);
