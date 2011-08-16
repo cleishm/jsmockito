@@ -86,9 +86,11 @@ JsMockito.mock = function(Obj) {
   };
 
   mockObject._jsMockitoMockFunctions = function() {
-    return JsMockito.map(mockObject, function(func) {
-      return JsMockito.isMock(func)? func : null;
-    });
+    return JsMockito.objectValues(
+      JsMockito.mapObject(mockObject, function(func) {
+        return JsMockito.isMock(func)? func : null;
+      })
+    );
   };
 
   return mockObject;

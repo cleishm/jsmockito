@@ -426,8 +426,8 @@ JsMockito = {
       JsHamcrest.Matchers.equalTo(obj);
   },
 
-  mapToMatchers: function(src) {
-    return JsMockito.map(src, function(obj) {
+  mapToMatchers: function(srcArray) {
+    return JsMockito.map(srcArray, function(obj) {
       return JsMockito.toMatcher(obj);
     });
   },
@@ -439,14 +439,14 @@ JsMockito = {
     JsMockito.extend(JsMockito.Verifiers[name].prototype, proto);
   },
 
-  each: function(src, callback) {
-    if (src.length == undefined) {
-      for (var key in src)
-        callback(src[key], key);
-    } else {
-      for (var i = 0; i < src.length; i++)
-        callback(src[i], i);
-    }
+  each: function(srcArray, callback) {
+    for (var i = 0; i < srcArray.length; i++)
+      callback(srcArray[i], i);
+  },
+
+  eachObject: function(srcObject, callback) {
+      for (var key in srcObject)
+        callback(srcObject[key], key);
   },
 
   extend: function(dstObject, srcObject) {
@@ -456,30 +456,53 @@ JsMockito = {
     return dstObject;
   },
 
-  map: function(src, callback) {
-    var result = (src.length == undefined)? {} : [];
-    JsMockito.each(src, function(elem, key) {
+  objectKeys: function(srcObject) {
+    var result = [];
+    JsMockito.eachObject(srcObject, function(elem, key) {
+      result.push(key);
+    });
+    return result;
+  },
+
+  objectValues: function(srcObject) {
+    var result = [];
+    JsMockito.eachObject(srcObject, function(elem, key) {
+      result.push(elem);
+    });
+    return result;
+  },
+
+  map: function(srcArray, callback) {
+    var result = [];
+    JsMockito.each(srcArray, function(elem, key) {
       var val = callback(elem, key);
       if (val != null)
-        if (result.length == undefined)
-          result[key] = val;
-        else
-          result.push(val);
+        result.push(val);
+    });
+    return result;
+  },
+
+  mapObject: function(srcObject, callback) {
+    var result = {};
+    JsMockito.eachObject(srcObject, function(elem, key) {
+      var val = callback(elem, key);
+      if (val != null)
+        result[key] = val;
     });
     return result;
   },
 
   mapInto: function(dstObject, srcObject, callback) {
     return JsMockito.extend(dstObject,
-      JsMockito.map(srcObject, function(elem, key) {
+      JsMockito.mapObject(srcObject, function(elem, key) {
         return callback(elem, key);
       })
     );
   },
 
-  grep: function(src, callback) {
+  grep: function(srcArray, callback) {
     var result = [];
-    JsMockito.each(src, function(elem, key) {
+    JsMockito.each(srcArray, function(elem, key) {
       if (callback(elem, key))
         result.push(elem);
     });

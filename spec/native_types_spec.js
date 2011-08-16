@@ -20,5 +20,23 @@ Screw.Unit(function() {
         });
       });
     });
+
+    describe('bulk verification of Array class', function() {
+      var mockArray;
+      before(function() {
+        mockArray = mock(Array);
+      });
+
+      it("should verifyZeroInteractions when there are none", function() {
+        verifyZeroInteractions(mockArray);
+      });
+
+      it("should fail to verifyZeroInterations when there are", function() {
+        mockArray.push(5);
+        assertThat(function() {
+          verifyZeroInteractions(mockArray);
+        }, throwsMessage('Never wanted but invoked: obj.push()'));
+      });
+    });
   });
 });
