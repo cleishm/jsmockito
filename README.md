@@ -112,7 +112,7 @@ or with objects:
     verify(mockedObject).push("foo");
     verify(mockedObject).pop();
 
-For more examples and documentation, look in the doc directory.
+For more examples and documentation, run 'ant doc' and then look in the doc directory.
 
 
 Who is your bartender?
