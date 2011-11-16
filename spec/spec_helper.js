@@ -23,7 +23,8 @@ Screw.Matchers.throwsMessage = function(exceptionText) {
   });
 }
 
-var MyObject = function() {
-  this.greeting = function() { return "hello" };
-  this.farewell = function() { return "goodbye" };
+var MyObject = function() {};
+MyObject.prototype = {
+  greeting: function() { return "hello" },
+  farewell: function() { return "goodbye" }
 };

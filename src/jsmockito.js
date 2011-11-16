@@ -392,7 +392,7 @@ JsMockito = {
    */
   spy: function(delegate) {
     return (typeof delegate == 'function')?
-      JsMockito.mockFunction(delegate) : JsMockito.mock(delegate);
+      JsMockito.mockFunction(delegate) : JsMockito.mock(delegate, delegate);
   },
 
   contextCaptureFunction: function(defaultContext, handler) {

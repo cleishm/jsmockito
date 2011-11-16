@@ -253,6 +253,31 @@ Screw.Unit(function() {
           assertThat(stubContext, sameAs(context), "Context was not the same");
         });
       });
+
+      describe("when mock object is created with a prototype", function() {
+        var mockObj;
+        before(function() {
+          mockObj = mock(MyObject.prototype);
+        });
+
+        it("should be an instance of the same class", function() {
+          assertThat(mockObj, instanceOf(MyObject));
+        });
+
+        it("should provide an instance of the same class when stubbing", function() {
+          var stubBuilder = when(mockObj);
+          assertThat(stubBuilder, instanceOf(MyObject));
+        });
+
+        it("should provide an instance of the same class when verifing", function() {
+          var verifier = verify(mockObj);
+          assertThat(verifier, instanceOf(MyObject));
+        });
+
+        it("should not invoke underlying prototype methods", function() {
+          assertThat(mockObj.greeting(), sameAs(undefined));
+        });
+      });
     });
   });
 });

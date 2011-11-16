@@ -3,9 +3,10 @@
 /**
  * Create a mockable and stubbable objects.
  *
- * <p>A mock is created with the constructor for an object as an argument.
- * Once created, the mock object will have all the same methods as the source
- * object which, when invoked, will return undefined by default.</p>
+ * <p>A mock is created with the constructor for an object, or a prototype
+ * object, as an argument.  Once created, the mock object will have all the
+ * same methods as the source object which, when invoked, will return undefined
+ * by default.</p>
  *
  * <p>Stub declarations may then be made for these methods to have them return
  * useful values or perform actions when invoked.</p>
@@ -26,19 +27,25 @@
  * JsMockito.verify(mockObj).add(1, 4); // will throw an exception
  * </pre>
  *
+ * Alternatively, using a prototype:
+ *
+ * <pre>
+ * myPrototype = {
+ *   add: function(a, b) { return a + b }
+ * };
+ *
+ * var mockObj = JsMockito.mock(myPrototype);
+ * mockObj.add(5, 4); // result is undefined
+ * </pre>
+ *
  * @param Obj {function} the constructor for the object to be mocked
  * @return {object} a mock object
  */
-JsMockito.mock = function(Obj) {
-  var delegate = {};
-  if (typeof Obj != "function") {
-    delegate = Obj;
-    Obj = function() { };
-    Obj.prototype = delegate; 
-    Obj.prototype.constructor = Obj;
-  }
+JsMockito.mock = function(Obj, delegate) {
+  delegate = delegate || {};
+
   var MockObject = function() { };
-  MockObject.prototype = new Obj;
+  MockObject.prototype = (typeof Obj == "function")? new Obj : Obj;
   MockObject.prototype.constructor = MockObject;
 
   var mockObject = new MockObject();
