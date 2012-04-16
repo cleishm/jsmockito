@@ -520,3 +520,5 @@ JsMockito = {
     return (this.find(array, callback) != undefined);
   }
 };
+
+if (typeof exports !== "undefined") exports.JsMockito = JsMockito;
