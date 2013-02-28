@@ -45,10 +45,7 @@ JsMockito.mock = function(Obj, delegate) {
   delegate = delegate || {};
 
   var MockObject = function() { };
-  MockObject.prototype = (typeof Obj == "function")? new Obj : Obj;
-  MockObject.prototype.constructor = MockObject;
-
-  var mockObject = new MockObject();
+  var mockObject = createMockObject();
   var stubBuilders = {};
   var verifiers = {};
   var mockFunctions = [];
@@ -97,6 +94,48 @@ JsMockito.mock = function(Obj, delegate) {
 
   mockObject._jsMockitoMockFunctions = function() {
     return mockFunctions;
+  };
+  
+  function getDescriptors(mockObject, descriptors) {
+    for(var methodName in mockObject) {
+      descriptors[methodName] = { enumerable: true, configurable: true, writable: true, value: null };
+    }
+    return descriptors;
+  }
+  
+  function createMockObject() {
+	
+    if(Object.create) {
+	  var objectToExtend = Obj.prototype ? Obj.prototype : Obj;
+	  var descriptors = getDescriptors(objectToExtend, getDescriptorsAddedInConstructor());
+      MockObject.prototype = Object.create(objectToExtend, descriptors);
+     
+      if(!MockObject.prototype.constructor) {
+        MockObject.prototype.constructor = MockObject;
+      }
+    } else {
+      MockObject.prototype = (typeof Obj === "function")? new Obj : Obj;
+      MockObject.prototype.constructor = MockObject;
+    }
+
+    return new MockObject();
+  };
+  
+  //object_spy_spec adds method in the constructor so we have to gather those.
+  function getDescriptorsAddedInConstructor() {
+    var descriptorsAddedInConstructor = {};
+	
+    try {
+      var objectToMock = new Obj();
+	
+      for(methodName in objectToMock) {
+        if(!Obj.prototype[methodName]) {
+          descriptorsAddedInConstructor[methodName] = { enumerable: true, configurable: true, writable: true, value: null };
+        }
+      }
+    } catch (e) {/*Constructors may throw an error if called with no arguments*/}
+    
+    return descriptorsAddedInConstructor;
   };
 
   return mockObject;
