@@ -5,7 +5,7 @@
  * @namespace
  */
 JsMockito.Verifiers = {
-  _export: ['never', 'zeroInteractions', 'noMoreInteractions', 'times', 'once'],
+  _export: ['never', 'zeroInteractions', 'noMoreInteractions', 'times', 'once', 'atLeast', 'atMost'],
 
   /**
    * Test that a invocation never occurred. For example:
@@ -18,7 +18,7 @@ JsMockito.Verifiers = {
     return new JsMockito.Verifiers.Times(0);
   },
 
-  /** Test that no interaction were made on the mock.  For example:
+  /** Test that no interaction were made on the mock. For example:
    * <pre>
    * verify(mock, zeroInteractions());
    * </pre>
@@ -28,7 +28,7 @@ JsMockito.Verifiers = {
     return new JsMockito.Verifiers.ZeroInteractions();
   },
 
-  /** Test that no further interactions remain unverified on the mock.  For
+  /** Test that no further interactions remain unverified on the mock. For
    * example:
    * <pre>
    * verify(mock, noMoreInteractions());
@@ -47,7 +47,7 @@ JsMockito.Verifiers = {
    *
    * @param wanted The number of desired invocations
    */
-  times: function(wanted) { 
+  times: function(wanted) {
     return new JsMockito.Verifiers.Times(wanted);
   },
 
@@ -59,8 +59,30 @@ JsMockito.Verifiers = {
    * This is the default verifier.
    * @see JsMockito.Verifiers.times(1)
    */
-  once: function() { 
+  once: function() {
     return new JsMockito.Verifiers.Times(1);
+  },
+
+  /**
+   * Test that an invocation occurred at least the specified number of times.
+   * For example:
+   * <pre>
+   * verify(mock, atLeast(2)).method();
+   * </pre>
+   */
+  atLeast: function(wanted) {
+    return new JsMockito.Verifiers.AtLeast(wanted);
+  },
+
+  /**
+   * Test that an invocation occurred at most the specified number of times.
+   * For example:
+   * <pre>
+   * verify(mock, atMost(3)).method();
+   * </pre>
+   */
+  atMost: function(wanted) {
+    return new JsMockito.Verifiers.AtMost(wanted);
   }
 };
 
@@ -133,6 +155,66 @@ JsMockito.verifier('Times', {
   }
 });
 
+JsMockito.verifier('AtLeast', {
+  init: function(wanted) {
+    this.wanted = wanted;
+  },
+
+  verifyInteractions: function(funcName, allInteractions, matchers, describeContext) {
+    var interactions = JsMockito.grep(allInteractions, function(interaction) {
+      return JsMockito.matchArray(matchers, interaction.args);
+    });
+    if (interactions.length >= this.wanted) {
+      this.updateVerifiedInteractions(interactions);
+      return;
+    }
+
+    var message;
+    if (interactions.length == 0) {
+      message = 'Wanted but not invoked';
+    } else if (this.wanted == 0) {
+      message = 'Never wanted but invoked';
+    } else if (this.wanted == 1) {
+      message = 'Wanted at least 1 invocation but got ' + interactions.length;
+    } else {
+      message = 'Wanted at least ' + this.wanted + ' invocations but got ' + interactions.length;
+    }
+
+    var description = this.buildDescription(message, funcName, matchers, describeContext);
+    throw description.get();
+  }
+});
+
+JsMockito.verifier('AtMost', {
+  init: function(wanted) {
+    this.wanted = wanted;
+  },
+
+  verifyInteractions: function(funcName, allInteractions, matchers, describeContext) {
+    var interactions = JsMockito.grep(allInteractions, function(interaction) {
+      return JsMockito.matchArray(matchers, interaction.args);
+    });
+    if (interactions.length <= this.wanted) {
+      this.updateVerifiedInteractions(interactions);
+      return;
+    }
+
+    var message;
+    if (interactions.length == 0) {
+      message = 'Wanted but not invoked';
+    } else if (this.wanted == 0) {
+      message = 'Never wanted but invoked';
+    } else if (this.wanted == 1) {
+      message = 'Wanted at most 1 invocation but got ' + interactions.length;
+    } else {
+      message = 'Wanted at most ' + this.wanted + ' invocations but got ' + interactions.length;
+    }
+
+    var description = this.buildDescription(message, funcName, matchers, describeContext);
+    throw description.get();
+  }
+});
+
 JsMockito.verifier('ZeroInteractions', {
   verify: function(mock) {
     var neverVerifier = JsMockito.Verifiers.never();
@@ -156,7 +238,7 @@ JsMockito.verifier('NoMoreInteractions', {
     });
     if (interactions.length == 0)
       return;
-    
+
     var description = this.buildDescription(
       "No interactions wanted, but " + interactions.length + " remains",
       funcName, matchers, describeContext);
