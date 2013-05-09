@@ -96,7 +96,8 @@ JsMockito.mock = function(Obj, delegate) {
     return mockFunctions;
   };
   
-  function getDescriptors(mockObject, descriptors) {
+  function getDescriptors(mockObject) {
+	var descriptors = getDescriptorsAddedInConstructor();
     for(var methodName in mockObject) {
       descriptors[methodName] = { enumerable: true, configurable: true, writable: true, value: null };
     }
@@ -107,7 +108,7 @@ JsMockito.mock = function(Obj, delegate) {
 	
     if(Object.create) {
 	  var objectToExtend = Obj.prototype ? Obj.prototype : Obj;
-	  var descriptors = getDescriptors(objectToExtend, getDescriptorsAddedInConstructor());
+	  var descriptors = getDescriptors(objectToExtend);
       MockObject.prototype = Object.create(objectToExtend, descriptors);
      
       if(!MockObject.prototype.constructor) {
