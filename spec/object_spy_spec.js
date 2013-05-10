@@ -5,12 +5,19 @@ Screw.Unit(function() {
       this.greeting = function() { return "hello" };
       this.farewell = function() { return "goodbye" };
     };
-    
+
     var mockObj;
     var proxyMock;
     before(function() {
       mockObj = mock(MyObject);
+      mockObj.property = "foo";
       proxyMock = spy(mockObj);
+    });
+
+    describe("when created", function() {
+      it("should copy properties", function() {
+        assertThat(proxyMock.property, equalTo(mockObj.property));
+      });
     });
 
     describe("when method invoked", function() {

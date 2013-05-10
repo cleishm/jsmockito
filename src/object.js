@@ -95,8 +95,20 @@ JsMockito.mock = function(Obj, delegate) {
   };
 
   JsMockito.each(JsMockito.propertyNames(mockObject), function(name) {
-    if (name != 'constructor' && typeof mockObject[name] === 'function')
+    if (name == 'constructor')
+      return;
+    if (typeof mockObject[name] === 'function')
       addMockMethod(name);
+    else if (delegate[name] != undefined) {
+      if (Object.defineProperty) {
+        Object.defineProperty(mockObject, name, {
+          get: function() { return delegate[name] },
+          set: function(val) { delegate[name] = val }
+        });
+      } else {
+        mockObject[name] = delegate[name];
+      }
+    }
   });
 
   for (var typeName in JsMockito.nativeTypes) {
