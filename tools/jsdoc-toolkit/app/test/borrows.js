@@ -17,10 +17,15 @@ function Layout(p) {
 	}
 }
 
+/** A static method. */
+Layout.units = function() {
+}
+
 /**
 @constructor
-@borrows Layout#orientation as #orientation
-@borrows Layout-getInnerElements as myGetInnerElements
+@borrows Layout#orientation
+@borrows Layout-getInnerElements
+@borrows Layout.units
 */
 function Page() {
 	/** reset the page */

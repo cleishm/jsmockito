@@ -49,6 +49,20 @@ JSDOC.Walker.prototype.step = function() {
 	
 		var doc = new JSDOC.DocComment(this.token.data);
 		
+				
+		if (doc.getTag("exports").length > 0) {
+			var exports = doc.getTag("exports")[0];
+
+			exports.desc.match(/(\S+) as (\S+)/i);
+			var n1 = RegExp.$1;
+			var n2 = RegExp.$2;
+			
+			if (!n1 && n2) throw "@exports tag requires a value like: 'name as ns.name'";
+			
+			JSDOC.Parser.rename = (JSDOC.Parser.rename || {});	
+			JSDOC.Parser.rename[n1] = n2
+		}
+		
 		if (doc.getTag("lends").length > 0) {
 			var lends = doc.getTag("lends")[0];
 
@@ -70,6 +84,12 @@ JSDOC.Walker.prototype.step = function() {
 			var virtualName = doc.getTag("name")[0].desc;
 			if (!virtualName) throw "@name tag requires a value.";
 			
+			if (doc.getTag("memberOf").length > 0) {
+				virtualName = (doc.getTag("memberOf")[0] + "." + virtualName)
+					.replace(/([#.])\./, "$1");
+				doc.deleteTag("memberOf");
+			}
+
 			var symbol = new JSDOC.Symbol(virtualName, [], "VIRTUAL", doc);
 			
 			JSDOC.Parser.addSymbol(symbol);
@@ -101,17 +121,17 @@ JSDOC.Walker.prototype.step = function() {
 		}
 	}
 	else if (!JSDOC.Parser.conf.ignoreCode) { // it's code
-		if (this.token.is("NAME")) {
+		if (this.token.is("NAME")) { // it's the name of something
 			var symbol;
 			var name = this.token.data;
 			var doc = null; if (this.lastDoc) doc = this.lastDoc;
 			var params = [];
-			
+		
 			// it's inside an anonymous object
 			if (this.ts.look(1).is("COLON") && this.ts.look(-1).is("LEFT_CURLY") && !(this.ts.look(-2).is("JSDOC") || this.namescope.last().comment.getTag("lends").length || this.ts.look(-2).is("ASSIGN") || this.ts.look(-2).is("COLON"))) {
 				name = "$anonymous";
 				name = this.namescope.last().alias+"-"+name
-				
+					
 				params = [];
 				
 				symbol = new JSDOC.Symbol(name, params, "OBJECT", doc);
@@ -129,7 +149,16 @@ JSDOC.Walker.prototype.step = function() {
 				var isInner;
 				
 				if (this.lastDoc) doc = this.lastDoc;
-				name = this.namescope.last().alias+"-"+name;
+				
+				if (doc && doc.getTag("memberOf").length > 0) {
+					name = (doc.getTag("memberOf")[0]+"."+name).replace("#.", "#");
+					doc.deleteTag("memberOf");
+				}
+				else {
+					name = this.namescope.last().alias+"-"+name;
+					if (!this.namescope.last().is("GLOBAL")) isInner = true;
+				}
+				
 				if (!this.namescope.last().is("GLOBAL")) isInner = true;
 				
 				params = JSDOC.Walker.onParamList(this.ts.balance("LEFT_PAREN"));
@@ -153,27 +182,45 @@ JSDOC.Walker.prototype.step = function() {
 			}
 			// foo = function() {}
 			else if (this.ts.look(1).is("ASSIGN") && this.ts.look(2).is("FUNCTION")) {
+				var constructs;
+				var isConstructor = false;
+				if (doc && (constructs = doc.getTag("constructs")) && constructs.length) {
+					if (constructs[0].desc) {
+						name = constructs[0].desc;
+						isConstructor = true;
+					}
+				}
+					
 				var isInner;
 				if (this.ts.look(-1).is("VAR") || this.isInner) {
-					name = this.namescope.last().alias+"-"+name
+					if (doc && doc.getTag("memberOf").length > 0) {
+						name = (doc.getTag("memberOf")[0]+"."+name).replace("#.", "#");
+						doc.deleteTag("memberOf");
+					}
+					else {
+						name = this.namescope.last().alias+"-"+name;
+						if (!this.namescope.last().is("GLOBAL")) isInner = true;
+					}
 					if (!this.namescope.last().is("GLOBAL")) isInner = true;
 				}
 				else if (name.indexOf("this.") == 0) {
 					name = this.resolveThis(name);
 				}
-				
+
 				if (this.lastDoc) doc = this.lastDoc;
 				params = JSDOC.Walker.onParamList(this.ts.balance("LEFT_PAREN"));
 				
 				symbol = new JSDOC.Symbol(name, params, "FUNCTION", doc);
+
 				if (isInner) symbol.isInner = true;
+				if (isConstructor) symbol.isa = "CONSTRUCTOR";
 				
 				if (this.ts.look(1).is("JSDOC")) {
 					var inlineReturn = ""+this.ts.look(1).data;
 					inlineReturn = inlineReturn.replace(/(^\/\*\* *| *\*\/$)/g, "");
 					symbol.type = inlineReturn;
 				}
-				
+
 				JSDOC.Parser.addSymbol(symbol);
 				
 				this.namescope.push(symbol);
@@ -182,8 +229,8 @@ JSDOC.Walker.prototype.step = function() {
 				if (matching) matching.popNamescope = name;
 				else LOG.warn("Mismatched } character. Can't parse code in file " + symbol.srcFile + ".");
 			}
-			// foo = new function() {}
-			else if (this.ts.look(1).is("ASSIGN") && this.ts.look(2).is("NEW") && this.ts.look(3).is("FUNCTION")) {
+			// foo = new function() {} or foo = (function() {}
+			else if (this.ts.look(1).is("ASSIGN") && (this.ts.look(2).is("NEW") || this.ts.look(2).is("LEFT_PAREN")) && this.ts.look(3).is("FUNCTION")) {
 				var isInner;
 				if (this.ts.look(-1).is("VAR") || this.isInner) {
 					name = this.namescope.last().alias+"-"+name
@@ -192,6 +239,8 @@ JSDOC.Walker.prototype.step = function() {
 				else if (name.indexOf("this.") == 0) {
 					name = this.resolveThis(name);
 				}
+
+				this.ts.next(3); // advance past the "new" or "("
 				
 				if (this.lastDoc) doc = this.lastDoc;
 				params = JSDOC.Walker.onParamList(this.ts.balance("LEFT_PAREN"));
@@ -275,6 +324,7 @@ JSDOC.Walker.prototype.step = function() {
 			// var foo;
 			else if (this.ts.look(1).is("SEMICOLON")) {
 				var isInner;
+
 				if (this.ts.look(-1).is("VAR") || this.isInner) {
 					name = this.namescope.last().alias+"-"+name
 					if (!this.namescope.last().is("GLOBAL")) isInner = true;
@@ -289,8 +339,7 @@ JSDOC.Walker.prototype.step = function() {
 				}
 			}
 			// foo = x
-			else if (this.ts.look(1).is("ASSIGN")) {
-				
+			else if (this.ts.look(1).is("ASSIGN")) {				
 				var isInner;
 				if (this.ts.look(-1).is("VAR") || this.isInner) {
 					name = this.namescope.last().alias+"-"+name
@@ -370,7 +419,6 @@ JSDOC.Walker.prototype.step = function() {
 				
 				symbol = new JSDOC.Symbol(name, params, "FUNCTION", doc);
 				
-			
 				JSDOC.Parser.addSymbol(symbol);
 				
 				this.namescope.push(symbol);

@@ -11,39 +11,39 @@ JSDOC.JsPlate = function(templateFile) {
 
 JSDOC.JsPlate.prototype.parse = function() {
 	this.template = this.template.replace(/\{#[\s\S]+?#\}/gi, "");
-	this.code = "var output=``"+this.template;
+	this.code = "var output=\u001e"+this.template;
 
 	this.code = this.code.replace(
 		/<for +each="(.+?)" +in="(.+?)" *>/gi, 
 		function (match, eachName, inName) {
-			return "``;\rvar $"+eachName+"_keys = keys("+inName+");\rfor(var $"+eachName+"_i = 0; $"+eachName+"_i < $"+eachName+"_keys.length; $"+eachName+"_i++) {\rvar $"+eachName+"_last = ($"+eachName+"_i == $"+eachName+"_keys.length-1);\rvar $"+eachName+"_key = $"+eachName+"_keys[$"+eachName+"_i];\rvar "+eachName+" = "+inName+"[$"+eachName+"_key];\routput+=``";
+			return "\u001e;\rvar $"+eachName+"_keys = keys("+inName+");\rfor(var $"+eachName+"_i = 0; $"+eachName+"_i < $"+eachName+"_keys.length; $"+eachName+"_i++) {\rvar $"+eachName+"_last = ($"+eachName+"_i == $"+eachName+"_keys.length-1);\rvar $"+eachName+"_key = $"+eachName+"_keys[$"+eachName+"_i];\rvar "+eachName+" = "+inName+"[$"+eachName+"_key];\routput+=\u001e";
 		}
 	);	
-	this.code = this.code.replace(/<if test="(.+?)">/g, "``;\rif ($1) { output+=``");
-	this.code = this.code.replace(/<elseif test="(.+?)"\s*\/>/g, "``;}\relse if ($1) { output+=``");
-	this.code = this.code.replace(/<else\s*\/>/g, "``;}\relse { output+=``");
-	this.code = this.code.replace(/<\/(if|for)>/g, "``;\r};\routput+=``");
+	this.code = this.code.replace(/<if test="(.+?)">/g, "\u001e;\rif ($1) { output+=\u001e");
+	this.code = this.code.replace(/<elseif test="(.+?)"\s*\/>/g, "\u001e;}\relse if ($1) { output+=\u001e");
+	this.code = this.code.replace(/<else\s*\/>/g, "\u001e;}\relse { output+=\u001e");
+	this.code = this.code.replace(/<\/(if|for)>/g, "\u001e;\r};\routput+=\u001e");
 	this.code = this.code.replace(
 		/\{\+\s*([\s\S]+?)\s*\+\}/gi,
 		function (match, code) {
-			code = code.replace(/"/g, "``"); // prevent qoute-escaping of inline code
+			code = code.replace(/"/g, "\u001e"); // prevent qoute-escaping of inline code
 			code = code.replace(/(\r?\n)/g, " ");
-			return "``+ ("+code+") +``";
+			return "\u001e+ ("+code+") +\u001e";
 		}
 	);
 	this.code = this.code.replace(
 		/\{!\s*([\s\S]+?)\s*!\}/gi,
 		function (match, code) {
-			code = code.replace(/"/g, "``"); // prevent qoute-escaping of inline code
+			code = code.replace(/"/g, "\u001e"); // prevent qoute-escaping of inline code
 			code = code.replace(/(\n)/g, " ");
-			return "``; "+code+";\routput+=``";
+			return "\u001e; "+code+";\routput+=\u001e";
 		}
 	);
-	this.code = this.code+"``;";
+	this.code = this.code+"\u001e;";
 
 	this.code = this.code.replace(/(\r?\n)/g, "\\n");
 	this.code = this.code.replace(/"/g, "\\\"");
-	this.code = this.code.replace(/``/g, "\"");
+	this.code = this.code.replace(/\u001e/g, "\"");
 }
 
 JSDOC.JsPlate.prototype.toCode = function() {

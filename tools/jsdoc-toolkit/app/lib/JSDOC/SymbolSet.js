@@ -16,8 +16,9 @@ JSDOC.SymbolSet.prototype.hasSymbol = function(alias) {
 }
 
 JSDOC.SymbolSet.prototype.addSymbol = function(symbol) {
-	if (this.hasSymbol(symbol.alias)) {
-		LOG.warn("Overwriting symbol documentation for: "+symbol.alias + ".");
+	if (JSDOC.opt.a && this.hasSymbol(symbol.alias)) {
+		LOG.warn("Overwriting symbol documentation for: " + symbol.alias + ".");
+		this.deleteSymbol(symbol.alias);
 	}
 	this._index.set(symbol.alias, symbol);
 }
@@ -62,10 +63,22 @@ JSDOC.SymbolSet.prototype.resolveBorrows = function() {
 		
 		var borrows = symbol.inherits;
 		for (var i = 0; i < borrows.length; i++) {
+		
+if (/#$/.test(borrows[i].alias)) {
+	LOG.warn("Attempted to borrow entire instance of "+borrows[i].alias+" but that feature is not yet implemented.");
+	return;
+}
 			var borrowed = this.getSymbol(borrows[i].alias);
+			
 			if (!borrowed) {
 				LOG.warn("Can't borrow undocumented "+borrows[i].alias+".");
 				continue;
+			}
+
+			if (borrows[i].as == borrowed.alias) {
+				var assumedName = borrowed.name.split(/([#.-])/).pop();
+				borrows[i].as = symbol.name+RegExp.$1+assumedName;
+				LOG.inform("Assuming borrowed as name is "+borrows[i].as+" but that feature is experimental.");
 			}
 			
 			var borrowAsName = borrows[i].as;
@@ -99,11 +112,11 @@ JSDOC.SymbolSet.prototype.resolveBorrows = function() {
 JSDOC.SymbolSet.prototype.resolveMemberOf = function() {
 	for (var p = this._index.first(); p; p = this._index.next()) {
 		var symbol = p.value;
+
 		if (symbol.is("FILE") || symbol.is("GLOBAL")) continue;
 		
 		// the memberOf value was provided in the @memberOf tag
-		else if (symbol.memberOf) {
-			
+		else if (symbol.memberOf) {			
 			// like foo.bar is a memberOf foo
 			if (symbol.alias.indexOf(symbol.memberOf) == 0) {
 				var memberMatch = new RegExp("^("+symbol.memberOf+")[.#-]?(.+)$");
@@ -130,6 +143,7 @@ JSDOC.SymbolSet.prototype.resolveMemberOf = function() {
 		// the memberOf must be calculated
 		else {
 			var parts = symbol.alias.match(/^(.*[.#-])([^.#-]+)$/);
+
 			if (parts) {
 				symbol.memberOf = parts[1];
 				symbol.name = parts[2];				

@@ -69,7 +69,7 @@ function Hexagon(sideLength) {
  * @param {int} One The first number to add 
  * @param {int} Two The second number to add 
  * @author Gabriel Reid
- * @deprecated So you shouldn't use it anymore!
+ * @deprecated So you shouldn't use it anymore! Use {@link Shape#getClassName} instead.
  */
 function Add(One, Two){
     return One + Two;

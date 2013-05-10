@@ -50,6 +50,22 @@ function publish(symbolSet) {
  	// get a list of all the classes in the symbolset
  	var classes = symbols.filter(isaClass).sort(makeSortby("alias"));
 	
+	// create a filemap in which outfiles must be to be named uniquely, ignoring case
+	if (JSDOC.opt.u) {
+		var filemapCounts = {};
+		Link.filemap = {};
+		for (var i = 0, l = classes.length; i < l; i++) {
+			var lcAlias = classes[i].alias.toLowerCase();
+			
+			if (!filemapCounts[lcAlias]) filemapCounts[lcAlias] = 1;
+			else filemapCounts[lcAlias]++;
+			
+			Link.filemap[classes[i].alias] = 
+				(filemapCounts[lcAlias] > 1)?
+				lcAlias+"_"+filemapCounts[lcAlias] : lcAlias;
+		}
+	}
+	
 	// create a class index, displayed in the left-hand column of every class page
 	Link.base = "../";
  	publish.classesIndex = classesTemplate.process(classes); // kept in memory
@@ -61,10 +77,11 @@ function publish(symbolSet) {
 		symbol.events = symbol.getEvents();   // 1 order matters
 		symbol.methods = symbol.getMethods(); // 2
 		
+		Link.currentSymbol= symbol;
 		var output = "";
 		output = classTemplate.process(symbol);
 		
-		IO.saveFile(publish.conf.outDir+"symbols/", symbol.alias+publish.conf.ext, output);
+		IO.saveFile(publish.conf.outDir+"symbols/", ((JSDOC.opt.u)? Link.filemap[symbol.alias] : symbol.alias) + publish.conf.ext, output);
 	}
 	
 	// regenerate the index with different relative links, used in the index pages

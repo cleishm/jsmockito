@@ -1,9 +1,9 @@
 /**
 	@overview
-	@date $Date: 2009-01-21 22:53:36 +0000 (Wed, 21 Jan 2009) $
-	@version $Revision: 771 $ 
-	@location $HeadURL: https://jsdoc-toolkit.googlecode.com/svn/tags/jsdoc_toolkit-2.1.0/jsdoc-toolkit/app/lib/JSDOC.js $
-	@name whateverFilename.js
+	@date $Date: 2010-06-13 22:02:44 +0100 (Sun, 13 Jun 2010) $
+	@version $Revision: 837 $ 
+	@location $HeadURL: https://jsdoc-toolkit.googlecode.com/svn/tags/jsdoc_toolkit-2.4.0/jsdoc-toolkit/app/lib/JSDOC.js $
+	@name JSDOC.js
  */
 
 /**
@@ -20,29 +20,31 @@ if (typeof arguments == "undefined") arguments = [];
 JSDOC.opt = Opt.get(
 	arguments, 
 	{
-		d: "directory",
-		c: "conf",
-		t: "template",
-		r: "recurse",
-		x: "ext",
-		p: "private",
 		a: "allfunctions", 
+		c: "conf",
+		d: "directory",
+		"D[]": "define",
 		e: "encoding",
+		"E[]": "exclude",
+		h: "help",
+		m: "multiple",
 		n: "nocode",
 		o: "out",
-		s: "suppress",
+		p: "private",
 		q: "quiet",
+		r: "recurse",
+		S: "securemodules",
+		s: "suppress",
+		t: "template",
 		T: "testmode",
-		h: "help",
+		u: "unique",
 		v: "verbose",
-		"D[]": "define",
-		"E[]": "exclude",
-		"H[]": "handler"
+		x: "ext"
 	}
 );
 
 /** The current version string of this application. */
-JSDOC.VERSION = "2.1.0";
+JSDOC.VERSION = "2.4.0";
 
 /** Print out usage information and quit. */
 JSDOC.usage = function() {
@@ -56,14 +58,17 @@ JSDOC.usage = function() {
 	print("  -e=<ENCODING> or --encoding=<ENCODING>\n          Use this encoding to read and write files.\n");
 	print("  -E=\"REGEX\" or --exclude=\"REGEX\"\n          Multiple. Exclude files based on the supplied regex.\n");
 	print("  -h or --help\n          Show this message and exit.\n");
+	print("  -m or --multiples\n          Don't warn about symbols being documented more than once.\n");
 	print("  -n or --nocode\n          Ignore all code, only document comments with @name tags.\n");
 	print("  -o=<PATH> or --out=<PATH>\n          Print log messages to a file (defaults to stdout).\n");
 	print("  -p or --private\n          Include symbols tagged as private, underscored and inner symbols.\n");
 	print("  -q or --quiet\n          Do not output any messages, not even warnings.\n");
 	print("  -r=<DEPTH> or --recurse=<DEPTH>\n          Descend into src directories.\n");
 	print("  -s or --suppress\n          Suppress source code output.\n");
+	print("  -S or --securemodules\n          Use Secure Modules mode to parse source code.\n");
 	print("  -t=<PATH> or --template=<PATH>\n          Required. Use this template to format the output.\n");
 	print("  -T or --test\n          Run all unit tests and exit.\n");
+	print("  -u or --unique\n          Force file names to be unique, but not based on symbol names.\n");
 	print("  -v or --verbose\n          Provide verbose feedback about what is happening.\n");
 	print("  -x=<EXT>[,EXT]... or --ext=<EXT>[,EXT]...\n          Scan source files with the given extension/s (defaults to js).\n");
 	

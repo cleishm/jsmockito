@@ -4,7 +4,7 @@ DESCRIPTION:
 
 This is the source code for JsDoc Toolkit, an automatic documentation
 generation tool for JavaScript. It is written in JavaScript and is run
-from a command line (or terminal) using the Java and Mozilla's Rhino
+from a command line (or terminal) using Java and Mozilla's Rhino
 JavaScript runtime engine.
 
 Using this tool you can automatically turn JavaDoc-like comments in
@@ -26,9 +26,9 @@ JsDoc Toolkit is known to work with:
 java version "1.6.0_03"
 Java(TM) SE Runtime Environment (build 1.6.0_03-b05)
 on Windows XP,
-and java version "1.5.0_13"
-Java(TM) 2 Runtime Environment, Standard Edition (build 1.5.0_13-b05-241)
-on Mac OS X 10.4.
+and java version "1.5.0_19"
+Java(TM) 2 Runtime Environment, Standard Edition (build 1.5.0_19-b02-304)
+on Mac OS X 10.5.
 
 Other versions of java may or may not work with JsDoc Toolkit.
 
@@ -67,6 +67,43 @@ $ java -jar jsrun.jar app/run.js --help
 
 More information about the various command line options used by JsDoc
 Toolkit are available on the project wiki.
+
+======================================================================
+
+RUNNING VIA SHELL SCRIPT
+
+Avi Deitcher has contributed the file jsrun.sh with the following usage notes:
+
+A script to simplify running jsdoc from the command-line, especially when
+running from within a development or build environment such as ant.
+
+Normally, to run jsdoc, you need a command-line as the following:
+java -Djsdoc.dir=/some/long/dir/path/to/jsdoc -jar
+/some/long/dir/path/to/jsdoc/jsrun.jar /some/long/dir/path/to/jsdoc/app/run.js
+-t=template -r=4 /some/long/dir/path/to/my/src/code
+
+This can get tedious to redo time and again, and difficult to use from within a build environment.
+
+To simplify the process, jsrun.sh will automatically run this path, as well as passing through any arguments.
+
+Usage: jsrun.sh <run.js arguments>
+
+All <run.js arguments> will be passed through.
+Additionally, jsrun.sh will take the following actions:
+1) If the environment variable JSDOCDIR is set, it will add
+"-Djsdoc.dir=$JSDOCDIR" to the command-line
+2) If the environment variable JSDOCTEMPLATEDIR is set, it will add
+"-Djsdoc.template.dir=$JSDOCTEMPLATEDIR" to the command-line
+3) java with the appropriate path to jsrun.jar and run.js will be instantiated
+
+If not variables are set, it is assumed that the path to jsrun.jar and app/ is in the current working directory.
+
+Example:
+# jsrun.sh ./src/
+Assuming JSDOCDIR=/some/path/to/my/jsdoc will cause the following command to
+execute:
+java -Djsdoc.dir=/some/path/to/my/jsdoc -jar /some/path/to/my/jsdoc/jsrun.jar
+/some/path/to/my/jsdoc/app/run.js ./src/
 
 ======================================================================
 

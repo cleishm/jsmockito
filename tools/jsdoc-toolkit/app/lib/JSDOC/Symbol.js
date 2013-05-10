@@ -9,7 +9,11 @@ JSDOC.Symbol = function() {
 	if (arguments.length) this.populate.apply(this, arguments);
 }
 
+JSDOC.Symbol.count = 0;
+
 JSDOC.Symbol.prototype.init = function() {
+	this._name = "";
+	this._params = [];
 	this.$args = [];
 	this.addOn = "";
 	this.alias = "";
@@ -20,24 +24,22 @@ JSDOC.Symbol.prototype.init = function() {
 	this.defaultValue = undefined;
 	this.deprecated = "";
 	this.desc = "";
-	this.fires = [];
 	this.example = [];
 	this.exceptions = [];
+	this.fires = [];
+	this.id = JSDOC.Symbol.count++;
 	this.inherits = [];
 	this.inheritsFrom = [];
 	this.isa = "OBJECT";
-	this.isEvent = false;
 	this.isConstant = false;
+	this.isEvent = false;
 	this.isIgnored = false;
 	this.isInner = false;
-	this.isEvent = false;
 	this.isNamespace = false;
 	this.isPrivate = false;
 	this.isStatic = false;
 	this.memberOf = "";
 	this.methods = [];
-	this._name = "";
-	this._params = [];
 	this.properties = [];
 	this.requires = [];
 	this.returns = [];
@@ -427,14 +429,13 @@ JSDOC.Symbol.prototype.setTags = function() {
 	if (properties.length) {
 		thisProperties = this.properties;
 		for (var i = 0; i < properties.length; i++) {
-			var property = new JSDOC.Symbol(this.alias+"#"+properties[i].name, [], "OBJECT", new JSDOC.DocComment("/**"+properties[i].desc+"\n@name "+properties[i].name+"\n@memberOf "+this.alias+"#*/"));
+			var property = new JSDOC.Symbol(this.alias+"#"+properties[i].name, [], "OBJECT", new JSDOC.DocComment("/**"+properties[i].desc+"*/"));
 			// TODO: shouldn't the following happen in the addProperty method of Symbol?
-			property.name = properties[i].name;
-			property.memberOf = this.alias;
 			if (properties[i].type) property.type = properties[i].type;
 			if (properties[i].defaultValue) property.defaultValue = properties[i].defaultValue;
 			this.addProperty(property);
-			JSDOC.Parser.addSymbol(property);
+			if (!JSDOC.Parser.symbols.getSymbolByName(property.name))
+				JSDOC.Parser.addSymbol(property);
 		}
 	}
 	
