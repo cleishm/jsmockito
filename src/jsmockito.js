@@ -546,32 +546,6 @@ JsMockito = {
       writable: true,
       value: description.value
     });
-  },
-
-  wrapObject: function(Obj) {
-    var obj = (typeof Obj === "function")? new Obj : Obj;
-
-    var proto;
-    if (Object.create) {
-      proto = Object.create(obj);
-      JsMockito.each(this.propertyNames(obj), function(name) {
-        if (name == 'constructor' || typeof obj[name] !== 'function')
-          return;
-        var desc = JsMockito.propertyDescriptor(obj, name);
-        JsMockito.overwriteProperty(proto, name, {
-          enumerable: desc.enumerable,
-          value: function() { }
-        });
-      });
-    } else {
-      proto = obj;
-    }
-
-    var Wrapper = function() { };
-    Wrapper.prototype = proto;
-    Wrapper.prototype.constructor = Wrapper;
-
-    return Wrapper;
   }
 };
 

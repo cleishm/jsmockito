@@ -44,7 +44,13 @@
 JsMockito.mock = function(Obj, delegate) {
   delegate = delegate || {};
 
-  var MockObject = JsMockito.wrapObject(Obj);
+  var MockObject = function() { };
+  try {
+    MockObject.prototype = (typeof Obj === "function")? new Obj : Obj;
+  } catch (e) {
+    throw new Error("mocked constructor threw an exception (consider mocking an object instead of a constructor)");
+  }
+  MockObject.prototype.constructor = MockObject;
 
   var mockObject = new MockObject();
   var stubBuilders = {};

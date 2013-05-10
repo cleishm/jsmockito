@@ -27,6 +27,17 @@ Screw.Unit(function() {
       });
     });
 
+    describe("when mocked constructor throws an exception", function() {
+      it("should return a helpful error message", function() {
+        assertThat(function() {
+          var FailingObject = function() { throw "bad" };
+          mock(FailingObject)
+        }, throwsMessage(
+          "Error: mocked constructor threw an exception (consider mocking an object instead of a constructor)")
+        );
+      });
+    });
+
     describe("when an unwritable mock object created", function() {
       var mockUnwritableObj;
       before(function() {
