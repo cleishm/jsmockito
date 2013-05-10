@@ -3,10 +3,16 @@
 /**
  * Create a mockable and stubbable objects.
  *
- * <p>A mock is created with the constructor for an object, or a prototype
- * object, as an argument.  Once created, the mock object will have all the
- * same methods as the source object which, when invoked, will return undefined
- * by default.</p>
+ * <p>A mock is created with a object prototype as an argument, or with a constructor
+ * (which will be called with no arguments to construct a prototype). Once
+ * created, the mock object will have all the same methods as the prototype. These
+ * methods, when invoked, will return undefined by default.</p>
+ *
+ * <p><b>Note: </b>If a constructor is provided, it <i>will be called with no
+ * arguments</i>. Be careful not to pass constructors that will modify the
+ * state of the application when invoked!. And if you're mocking objects that
+ * require arguments to the constructor then you <i>must</i> create an instance
+ * first and supply that instance as a prototype.</p>
  *
  * <p>Stub declarations may then be made for these methods to have them return
  * useful values or perform actions when invoked.</p>

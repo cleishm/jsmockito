@@ -2,7 +2,20 @@
 Screw.Unit(function() {
   describe('JsMockito README examples', function() {
     describe("Basic verification", function() {
-      it("should verify objects", function() {
+      it("should verify objects (via prototype)", function() {
+        var prototype = new Array();
+        var mockedArray = mock(prototype);
+
+        //using mock object
+        mockedArray.push("one");
+        mockedArray.reverse();
+
+        //verification
+        verify(mockedArray).push("one");
+        verify(mockedArray).reverse();
+      });
+
+      it("should verify objects (via constructor)", function() {
         var mockedArray = mock(Array);
 
         //using mock object

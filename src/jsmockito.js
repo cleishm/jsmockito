@@ -32,9 +32,31 @@
  *
  * <h2><a name="1">1. Let's verify some behaviour!</a></h2>
  *
- * <p>For an object:</p>
+ * <p>For an object (via a prototype):</p>
  * <pre>
  * //mock creation
+ * var prototype = new Array();
+ * var mockedArray = mock(prototype);
+ *
+ * //using mock object
+ * mockedArray.push("one");
+ * mockedArray.reverse();
+ *
+ * //using mock object
+ * mockedArray.push("one");
+ * mockedArray.reverse();
+ *
+ * //verification
+ * verify(mockedArray).push("one");
+ * verify(mockedArray).reverse();
+ * </pre>
+ *
+ * <p>For an object (via a constructor):</p>
+ * <pre>
+ * //mock creation
+ * //WARNING: The constructor function will be run with no arguments!
+ * //  Don't use this with functions that change the state of the application, use
+ * //  a prototype instead (as described above).
  * var mockedArray = mock(Array);
  *
  * //using mock object
