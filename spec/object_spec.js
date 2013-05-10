@@ -33,7 +33,7 @@ Screw.Unit(function() {
           var FailingObject = function() { throw "bad" };
           mock(FailingObject)
         }, throwsMessage(
-          "Error: mocked constructor threw an exception (consider mocking an object instead of a constructor)")
+          "mocked constructor threw an exception (consider mocking an object instead of a constructor)")
         );
       });
     });

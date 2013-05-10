@@ -151,7 +151,7 @@ JsMockito.verifier('Times', {
     }
 
     var description = this.buildDescription(message, funcName, matchers, describeContext);
-    throw description.get();
+    throw new Error(description.get());
   }
 });
 
@@ -181,7 +181,7 @@ JsMockito.verifier('AtLeast', {
     }
 
     var description = this.buildDescription(message, funcName, matchers, describeContext);
-    throw description.get();
+    throw new Error(description.get());
   }
 });
 
@@ -211,7 +211,7 @@ JsMockito.verifier('AtMost', {
     }
 
     var description = this.buildDescription(message, funcName, matchers, describeContext);
-    throw description.get();
+    throw new Error(description.get());
   }
 });
 
@@ -242,6 +242,6 @@ JsMockito.verifier('NoMoreInteractions', {
     var description = this.buildDescription(
       "No interactions wanted, but " + interactions.length + " remains",
       funcName, matchers, describeContext);
-    throw description.get();
+    throw new Error(description.get());
   }
 });

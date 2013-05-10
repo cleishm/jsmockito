@@ -8,7 +8,8 @@ Screw.Matchers.throwsMessage = function(exceptionText) {
       try {
         actualFunction();
       } catch (e) {
-        if (JsHamcrest.Matchers.equalTo(exceptionText).matches(e)) {
+        var message = e.message || e;
+        if (JsHamcrest.Matchers.equalTo(exceptionText).matches(message)) {
           return true;
         } else {
           throw e;
