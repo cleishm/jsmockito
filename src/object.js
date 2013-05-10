@@ -44,9 +44,7 @@
 JsMockito.mock = function(Obj, delegate) {
   delegate = delegate || {};
 
-  var MockObject = function() { };
-  MockObject.prototype = (typeof Obj == "function")? new Obj : Obj;
-  MockObject.prototype.constructor = MockObject;
+  var MockObject = JsMockito.wrapObject(Obj);
 
   var mockObject = new MockObject();
   var stubBuilders = {};
@@ -64,16 +62,30 @@ JsMockito.mock = function(Obj, delegate) {
       };
     }
     var mockFunc = JsMockito.mockFunction('obj.' + name, delegateMethod);
-    mockObject[name] = mockFunc;
-    stubBuilders[name] = mockFunc._jsMockitoStubBuilder;
-    verifiers[name] = mockFunc._jsMockitoVerifier;
+    var desc = JsMockito.propertyDescriptor(mockObject, name);
+    var enumerable = desc? desc.enumerable : true;
+
+    JsMockito.defineProperty(mockObject, name, {
+      enumerable: enumerable,
+      writable: true,
+      configurable: true,
+      value: mockFunc
+    });
+    stubBuilders[name] = {
+      enumerable: enumerable,
+      value: mockFunc._jsMockitoStubBuilder
+    };
+    verifiers[name] = {
+      enumerable: enumerable,
+      value: mockFunc._jsMockitoVerifier
+    };
     mockFunctions.push(mockFunc);
   };
 
-  for (var methodName in mockObject) {
-    if (methodName != 'constructor')
-      addMockMethod(methodName);
-  }
+  JsMockito.each(JsMockito.propertyNames(mockObject), function(name) {
+    if (name != 'constructor' && typeof mockObject[name] === 'function')
+      addMockMethod(name);
+  });
 
   for (var typeName in JsMockito.nativeTypes) {
     if (mockObject instanceof JsMockito.nativeTypes[typeName].type) {
@@ -83,21 +95,40 @@ JsMockito.mock = function(Obj, delegate) {
     }
   }
 
-  mockObject._jsMockitoStubBuilder = function() {
-    return JsMockito.mapInto(new MockObject(), stubBuilders, function(method) {
-      return method.call(this, contextMatcher);
-    });
-  };
+  JsMockito.defineProperty(mockObject, '_jsMockitoStubBuilder', {
+    enumerable: false,
+    value: function() {
+      var stubBuilderObj = new MockObject();
+      JsMockito.eachObject(stubBuilders, function(desc, name) {
+        JsMockito.overwriteProperty(stubBuilderObj, name, {
+          enumerable: desc.enumerable,
+          value: desc.value.call(this, contextMatcher)
+        });
+      });
+      return stubBuilderObj;
+    }
+  });
 
-  mockObject._jsMockitoVerifier = function(verifier) {
-    return JsMockito.mapInto(new MockObject(), verifiers, function(method) {
-      return method.call(this, verifier, contextMatcher);
-    });
-  };
+  JsMockito.defineProperty(mockObject, '_jsMockitoVerifier', {
+    enumerable: false,
+    value: function(verifier) {
+      var verifierObj = new MockObject();
+      JsMockito.eachObject(verifiers, function(desc, name) {
+        JsMockito.overwriteProperty(verifierObj, name, {
+          enumerable: desc.enumerable,
+          value: desc.value.call(this, verifier, contextMatcher)
+        });
+      });
+      return verifierObj;
+    }
+  });
 
-  mockObject._jsMockitoMockFunctions = function() {
-    return mockFunctions;
-  };
+  JsMockito.defineProperty(mockObject, '_jsMockitoMockFunctions', {
+    enumerable: false,
+    value: function() {
+      return mockFunctions;
+    }
+  });
 
   return mockObject;
 };

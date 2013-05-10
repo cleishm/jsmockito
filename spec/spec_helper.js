@@ -28,3 +28,10 @@ MyObject.prototype = {
   greeting: function() { return "hello" },
   farewell: function() { return "goodbye" }
 };
+
+var MyUnwritableObject = function() {};
+
+Object.defineProperties(MyUnwritableObject.prototype, {
+  greeting: { enumerable: false, writable: false, value: function() { return "hello" } },
+  farewell: { enumerable: true, writable: false, value: function() { return "goodbye" } }
+});

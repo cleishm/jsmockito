@@ -482,24 +482,6 @@ JsMockito = {
     return result;
   },
 
-  mapObject: function(srcObject, callback) {
-    var result = {};
-    JsMockito.eachObject(srcObject, function(elem, key) {
-      var val = callback(elem, key);
-      if (val != null)
-        result[key] = val;
-    });
-    return result;
-  },
-
-  mapInto: function(dstObject, srcObject, callback) {
-    return JsMockito.extend(dstObject,
-      JsMockito.mapObject(srcObject, function(elem, key) {
-        return callback(elem, key);
-      })
-    );
-  },
-
   grep: function(srcArray, callback) {
     var result = [];
     JsMockito.each(srcArray, function(elem, key) {
@@ -518,6 +500,78 @@ JsMockito = {
 
   any: function(array, callback) {
     return (this.find(array, callback) != undefined);
+  },
+
+  propertyNames: function(object) {
+    if (Object.getOwnPropertyNames) {
+      var prototype = Object.getPrototypeOf(object);
+      // top-most prototype object should be ignored
+      if (!prototype)
+        return [];
+      var ownNames = Object.getOwnPropertyNames(object);
+      return JsMockito.propertyNames(prototype).concat(ownNames);
+    } else {
+      var props = [];
+      for (var name in object)
+        props.push(name);
+      return props;
+    }
+  },
+
+  propertyDescriptor: function(object, name) {
+    if (!Object.getOwnPropertyDescriptor)
+      return undefined;
+
+    var descriptor = Object.getOwnPropertyDescriptor(object, name)
+    if (descriptor != undefined)
+      return descriptor;
+    var prototype = Object.getPrototypeOf(object);
+    if (!prototype || !Object.getPrototypeOf(prototype))
+      return undefined;
+    return this.propertyDescriptor(prototype, name);
+  },
+
+  defineProperty: function(object, name, description) {
+    if (!Object.defineProperty) {
+      object[name] = description.value;
+      return;
+    }
+    Object.defineProperty(object, name, description);
+  },
+
+  overwriteProperty: function(object, name, description) {
+    JsMockito.defineProperty(object, name, {
+      enumerable: description.enumerable,
+      configurable: true,
+      writable: true,
+      value: description.value
+    });
+  },
+
+  wrapObject: function(Obj) {
+    var obj = (typeof Obj === "function")? new Obj : Obj;
+
+    var proto;
+    if (Object.create) {
+      proto = Object.create(obj);
+      JsMockito.each(this.propertyNames(obj), function(name) {
+        if (name == 'constructor' || typeof obj[name] !== 'function')
+          return;
+        var desc = JsMockito.propertyDescriptor(obj, name);
+        JsMockito.overwriteProperty(proto, name, {
+          enumerable: desc.enumerable,
+          value: function() { }
+        });
+      });
+    } else {
+      proto = obj;
+    }
+
+    var Wrapper = function() { };
+    Wrapper.prototype = proto;
+    Wrapper.prototype.constructor = Wrapper;
+
+    return Wrapper;
   }
 };
 

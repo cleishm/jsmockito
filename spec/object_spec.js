@@ -27,7 +27,32 @@ Screw.Unit(function() {
       });
     });
 
-    describe("when mock method invoked once with no arguments", function() { 
+    describe("when an unwritable mock object created", function() {
+      var mockUnwritableObj;
+      before(function() {
+        mockUnwritableObj = mock(MyUnwritableObject);
+      });
+
+      it("should be an instance of the same class", function() {
+        assertThat(mockUnwritableObj, instanceOf(MyUnwritableObject));
+      });
+
+      it("should provide an instance of the same class when stubbing", function() {
+        var stubBuilder = when(mockUnwritableObj);
+        assertThat(stubBuilder, instanceOf(MyUnwritableObject));
+      });
+
+      it("should provide an instance of the same class when verifing", function() {
+        var verifier = verify(mockUnwritableObj);
+        assertThat(verifier, instanceOf(MyUnwritableObject));
+      });
+
+      it("should verify that mock object had zero interactions", function() {
+        verifyZeroInteractions(mockUnwritableObj);
+      });
+    });
+
+    describe("when mock method invoked once with no arguments", function() {
       var mockObj;
       var result;
       before(function() {
@@ -85,6 +110,68 @@ Screw.Unit(function() {
 
         it("should verify that mock object had no more interactions", function() {
           verifyNoMoreInteractions(mockObj);
+        });
+      });
+    });
+
+    describe("when mock method on a mock of an unwritable object invoked once with no arguments", function() {
+      var mockUnwritableObj;
+      var result;
+      before(function() {
+        mockUnwritableObj = mock(MyUnwritableObject);
+        result = mockUnwritableObj.greeting();
+      });
+
+      it("should return undefined", function() {
+        assertThat(result, sameAs(undefined));
+      });
+
+      it("should verify method was invoked", function() {
+        verify(mockUnwritableObj).greeting();
+      });
+
+      it("should verify method was invoked with context", function() {
+        verify(mockUnwritableObj).greeting.call(mockUnwritableObj);
+      });
+
+      it("should verify method was invocked using context matcher", function() {
+        verify(mockUnwritableObj).greeting.apply(anything(), []);
+      });
+
+      it("should not verify method was invoked with different context", function() {
+        var testContext = {};
+        assertThat(function() {
+          verify(mockUnwritableObj).greeting.call(testContext);
+        }, throwsMessage(
+          "Wanted but not invoked: obj.greeting(), 'this' being equal to " + testContext)
+        );
+      });
+
+      it("should verify that method was not invoked twice", function() {
+        assertThat(function() {
+          verify(mockUnwritableObj, times(2)).greeting();
+        }, throwsMessage("Wanted 2 invocations but got 1: obj.greeting()"));
+      });
+
+      it("should not verify that the mock object had zero interactions", function() {
+        assertThat(function() {
+          verifyZeroInteractions(mockUnwritableObj);
+        }, throwsMessage("Never wanted but invoked: obj.greeting()"));
+      });
+
+      it("should not verify that the mock object had no more interactions", function() {
+        assertThat(function() {
+          verifyNoMoreInteractions(mockUnwritableObj);
+        }, throwsMessage("No interactions wanted, but 1 remains: obj.greeting()"));
+      });
+
+      describe("when verified", function() {
+        before(function() {
+          verify(mockUnwritableObj).greeting();
+        });
+
+        it("should verify that mock object had no more interactions", function() {
+          verifyNoMoreInteractions(mockUnwritableObj);
         });
       });
     });

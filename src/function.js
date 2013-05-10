@@ -51,40 +51,49 @@ JsMockito.mockFunction = function(funcName, delegate) {
 
   mockFunc.prototype = delegate.prototype;
 
-  mockFunc._jsMockitoStubBuilder = function(contextMatcher) {
-    var contextMatcher = contextMatcher || JsHamcrest.Matchers.anything();
-    return matcherCaptureFunction(contextMatcher, function(matchers) {
-      var stubMatch = [matchers, []];
-      stubMatchers.unshift(stubMatch);
-      return {
-        then: function() {
-          stubMatch[1].push.apply(stubMatch[1], arguments);
-          return this;
-        },
-        thenReturn: function() {
-          return this.then.apply(this,JsMockito.map(arguments, function(value) {
-            return function() { return value };
-          }));
-        },
-        thenThrow: function(exception) {
-          return this.then.apply(this,JsMockito.map(arguments, function(value) {
-            return function() { throw value };
-          }));
-        }
-      };
-    });
-  };
+  JsMockito.defineProperty(mockFunc, '_jsMockitoStubBuilder', {
+    enumerable: false,
+    value: function(contextMatcher) {
+      var contextMatcher = contextMatcher || JsHamcrest.Matchers.anything();
+      return matcherCaptureFunction(contextMatcher, function(matchers) {
+        var stubMatch = [matchers, []];
+        stubMatchers.unshift(stubMatch);
+        return {
+          then: function() {
+            stubMatch[1].push.apply(stubMatch[1], arguments);
+            return this;
+          },
+          thenReturn: function() {
+            return this.then.apply(this,JsMockito.map(arguments, function(value) {
+              return function() { return value };
+            }));
+          },
+          thenThrow: function(exception) {
+            return this.then.apply(this,JsMockito.map(arguments, function(value) {
+              return function() { throw value };
+            }));
+          }
+        };
+      });
+    }
+  });
 
-  mockFunc._jsMockitoVerifier = function(verifier, contextMatcher) {
-    var contextMatcher = contextMatcher || JsHamcrest.Matchers.anything();
-    return matcherCaptureFunction(contextMatcher, function(matchers) {
-      return verifier(funcName, interactions, matchers, matchers[0] != contextMatcher);
-    });
-  };
+  JsMockito.defineProperty(mockFunc, '_jsMockitoVerifier', {
+    enumerable: false,
+    value: function(verifier, contextMatcher) {
+      var contextMatcher = contextMatcher || JsHamcrest.Matchers.anything();
+      return matcherCaptureFunction(contextMatcher, function(matchers) {
+        return verifier(funcName, interactions, matchers, matchers[0] != contextMatcher);
+      });
+    }
+  });
 
-  mockFunc._jsMockitoMockFunctions = function() {
-    return [ mockFunc ];
-  };
+  JsMockito.defineProperty(mockFunc, '_jsMockitoMockFunctions', {
+    enumerable: false,
+    value: function() {
+      return [ mockFunc ];
+    }
+  });
 
   return mockFunc;
 
