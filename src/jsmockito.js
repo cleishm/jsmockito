@@ -521,7 +521,7 @@ JsMockito = {
   },
 
   any: function(array, callback) {
-    return (this.find(array, callback) != undefined);
+    return (JsMockito.find(array, callback) != undefined);
   },
 
   propertyNames: function(object) {
@@ -530,8 +530,13 @@ JsMockito = {
       // top-most prototype object should be ignored
       if (!prototype)
         return [];
+      var names = JsMockito.propertyNames(prototype);
       var ownNames = Object.getOwnPropertyNames(object);
-      return JsMockito.propertyNames(prototype).concat(ownNames);
+      JsMockito.each(ownNames, function(name) {
+        if (!JsMockito.any(names, function(n) { n == name }))
+          names.push(name);
+      });
+      return names;
     } else {
       var props = [];
       for (var name in object)
