@@ -36,7 +36,15 @@ JsMockito.Integration = {
   JsTestDriver: function() {
     JsMockito.Integration.importTo(window);
   },
-  
+
+  /**
+   * Make the public JsMockito API available to jasmine
+   * @see JsMockito.Integration.importTo(window)
+   */
+  jasmine: function() {
+    JsMockito.Integration.importTo(window);
+  },
+
   /**
    * Make the public JsMockito API available to Node.js / NodeUnit
    * @see JsMockito.Integration.importTo(global)
