@@ -108,7 +108,7 @@
  * } catch (e) {
  *   ex = e;
  * }
- * assertThat(ex, equalTo('An exception');
+ * assertThat(ex, equalTo('An exception'));
  *
  * //the following invokes the stub method, which returns 3
  * assertThat(mockedArray.slice(2), equalTo(3));
@@ -162,7 +162,7 @@
  * } catch (e) {
  *   ex = e;
  * }
- * assertThat(ex, equalTo('An exception');
+ * assertThat(ex, equalTo('An exception'));
  *
  * //the following invokes the stub method, which returns 3
  * assertThat(mockedFunc(2), equalTo(3));
